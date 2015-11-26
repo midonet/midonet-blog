@@ -1,0 +1,54 @@
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+DROP TABLE IF EXISTS `wp_comments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `wp_comments` (
+  `comment_ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `comment_post_ID` bigint(20) unsigned NOT NULL DEFAULT '0',
+  `comment_author` tinytext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `comment_author_email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `comment_author_url` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `comment_author_IP` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `comment_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `comment_date_gmt` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `comment_content` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `comment_karma` int(11) NOT NULL DEFAULT '0',
+  `comment_approved` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '1',
+  `comment_agent` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `comment_type` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `comment_parent` bigint(20) unsigned NOT NULL DEFAULT '0',
+  `user_id` bigint(20) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`comment_ID`),
+  KEY `comment_post_ID` (`comment_post_ID`),
+  KEY `comment_approved_date_gmt` (`comment_approved`,`comment_date_gmt`),
+  KEY `comment_date_gmt` (`comment_date_gmt`),
+  KEY `comment_parent` (`comment_parent`),
+  KEY `comment_author_email` (`comment_author_email`(10))
+) ENGINE=InnoDB AUTO_INCREMENT=547 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+LOCK TABLES `wp_comments` WRITE;
+/*!40000 ALTER TABLE `wp_comments` DISABLE KEYS */;
+INSERT INTO `wp_comments` VALUES (2,71,'Introduction to MN&#039;s Overlay Network Models (Part 2 - Tenant Routers and Bridges) - The MidoNet Blog','','http://blog.midonet.org/introduction-mns-overlay-network-models-part-2-tenant-routers-bridges/','127.0.0.1','2014-12-01 16:47:58','2014-12-01 16:47:58','[&#8230;] to familiarize users with MidoNet&#8217;s overlay virtual networking approach and models. In part 1 we discussed MN&#8217;s Provider Router. In this article we discuss Tenant Routers and [&#8230;]',0,'1','The Incutio XML-RPC PHP Library -- WordPress/4.0.1','pingback',0,0),(3,79,'Introduction to MN&#039;s Overlay Network Models (Part 1 - Provider Router) - The MidoNet Blog','','http://blog.midonet.org/introduction-mns-overlay-network-models-part-1-provider-router/','127.0.0.1','2014-12-01 16:49:25','2014-12-01 16:49:25','[&#8230;] relate to MidoNet concepts. In this post we focus on MidoNet&#8217;s Provider Router, in the Part 2 we&#8217;ll discuss Tenant [&#8230;]',0,'1','The Incutio XML-RPC PHP Library -- WordPress/4.0.1','pingback',0,0),(4,71,'Introduction to MN&#039;s Overlay Network Models (Part 3 - Simulations) - The MidoNet Blog','','http://blog.midonet.org/introduction-mns-overlay-network-models-part-3-simulations/','127.0.0.1','2014-12-01 18:06:43','2014-12-01 18:06:43','[&#8230;] to familiarize users with MidoNet&#8217;s overlay virtual networking approach and models. In part 1 we discussed MN&#8217;s Provider Router and in Part 2 we discussed Tenant Routers and Networks. In [&#8230;]',0,'1','The Incutio XML-RPC PHP Library -- WordPress/4.0.1','pingback',0,0),(5,79,'Introduction to MN&#039;s Overlay Network Models (Part 3 - Simulations) - The MidoNet Blog','','http://blog.midonet.org/introduction-mns-overlay-network-models-part-3-simulations/','127.0.0.1','2014-12-01 18:08:52','2014-12-01 18:08:52','[&#8230;] overlay virtual networking models. In part 1 we discussed MN&#8217;s Provider Router and in Part 2 we discussed Tenant Routers and [&#8230;]',0,'1','The Incutio XML-RPC PHP Library -- WordPress/4.0.1','pingback',0,0),(6,79,'stackingclouds','stackingclouds@gmail.com','','88.9.218.114','2014-12-02 21:26:57','2014-12-02 21:26:57','Nice article. A little diagram or pic to follow the workflow would be perfect!',0,'1','Mozilla/5.0 (Windows NT 6.3; WOW64; rv:33.0) Gecko/20100101 Firefox/33.0','',0,0),(7,71,'Introduction to MN (Part 4 - Security Groups) - The MidoNet Blog','','http://blog.midonet.org/introduction-to-mn-part-4-security-groups/','127.0.0.1','2014-12-06 20:20:26','2014-12-06 20:20:26','[&#8230;] Part 1 covered MN&#8217;s Provider Router. [&#8230;]',0,'1','The Incutio XML-RPC PHP Library -- WordPress/4.0.1','pingback',0,0),(8,71,'Introduction to MN (Part 5 – Flow State) - The MidoNet Blog','','http://blog.midonet.org/introduction-to-mn-part-5-flow-state/','127.0.0.1','2014-12-06 21:40:44','2014-12-06 21:40:44','[&#8230;] Part 1 covered MN&#8217;s Provider Router. [&#8230;]',0,'1','The Incutio XML-RPC PHP Library -- WordPress/4.0.1','pingback',0,0),(9,79,'Introduction to MN (Part 5 – Flow State) - The MidoNet Blog','','http://blog.midonet.org/introduction-to-mn-part-5-flow-state/','127.0.0.1','2014-12-06 21:43:01','2014-12-06 21:43:01','[&#8230;] Part 2 covered Tenant Routers and Networks. [&#8230;]',0,'1','The Incutio XML-RPC PHP Library -- WordPress/4.0.1','pingback',0,0),(10,71,'Introduction to MN (Part 6 – VLAN L2 Gateway) - The MidoNet Blog','','http://blog.midonet.org/intro-to-mn-part-6-vlan-l2gateways/','127.0.0.1','2014-12-09 12:05:00','2014-12-09 12:05:00','[&#8230;] Part 1 covered MN&#8217;s Provider Router. [&#8230;]',0,'1','The Incutio XML-RPC PHP Library -- WordPress/4.0.1','pingback',0,0),(112,250,'Alexandre Mclean (@AlexandreMclean)','AlexandreMclean@twitter.example.com','http://twitter.com/AlexandreMclean','67.71.32.186','2015-02-25 03:07:35','2015-02-25 03:07:35','+1 for the move!',0,'1','Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36','',0,0),(155,368,'Networking Receives an Upgrade | Docker Blog','','https://blog.docker.com/2015/06/networking-receives-an-upgrade/','173.236.235.175','2015-06-22 17:44:14','2015-06-22 17:44:14','[&#8230;] Loads of partners are already writing plugins or planning to integrate with Docker’s new networking system. Read more in our partner blog posts from Project Calico, Nuage Networks, Cisco, VMware, Microsoft, Weave, Midokura. [&#8230;]',0,'1','The Incutio XML-RPC PHP Library -- WordPress/4.2.2','pingback',0,0),(156,368,'Extending Docker with Plugins | Docker Blog','','https://blog.docker.com/2015/06/extending-docker-with-plugins/','173.236.235.175','2015-06-22 17:46:29','2015-06-22 17:46:29','[&#8230;] The Docker plugins mechanism is now available in the new Docker experimental channel. Also available are the first Docker plugins, including Flocker for portable volumes across hosts, and networking plugins available from Weave, Project Calico, Nuage Networks, Cisco, VMware, Microsoft, and Midokura. [&#8230;]',0,'1','The Incutio XML-RPC PHP Library -- WordPress/4.2.2','pingback',0,0),(158,368,'Wrap-up: Day 1 of DockerCon 2015 | Docker Blog','','https://blog.docker.com/2015/06/wrap-up-day-1-of-dockercon-2015/','173.236.235.175','2015-06-23 15:48:25','2015-06-23 15:48:25','[&#8230;] [MIDOKURA] Docker Networking sets sail with MidoNet  [&#8230;]',0,'1','The Incutio XML-RPC PHP Library -- WordPress/4.2.2','pingback',0,0),(160,368,'Docker Networking sets sail with MidoNet - The ...','','http://www.scoop.it/t/docker-by-docker/p/4046435148/2015/06/24/docker-networking-sets-sail-with-midonet-the-midonet-blog','185.82.148.10','2015-06-24 17:16:03','2015-06-24 17:16:03','[&#8230;] MidoNet supports libnetwork in Docker to provide multi-host Docker networking. Contribute to MidoNet via midonet.org.&nbsp; [&#8230;]',0,'1','Mozilla/5.0 (Windows; U; Windows NT 6.1; fr; rv:1.9.0.6) Gecko/2009011913 Firefox/3.0.6','pingback',0,0),(395,272,'wenjianhn','wenjianhn@gmail.com','http://wenjianhn.wordpress.com','52.68.33.165','2015-08-25 08:51:34','2015-08-25 08:51:34','The configuration format has changed since Prometheus 0.14.\r\nI have migrated it to a yaml format:\r\nhttps://gist.github.com/wenjianhn/ea0d932e2f5b58a31afe\r\n\r\nThe path of the configuration file was changed to \"/etc/prometheus/prometheus.yml\".\r\n\r\nThe ID of my prometheus image is 1e524c7912a7.\r\nIt was created 4 weeks ago.',0,'1','Mozilla/5.0 (X11; Fedora; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.155 Safari/537.36','',0,0),(508,482,'MidoNet Mini-Summit Tokyo Agenda','','http://blog.midonet.org/announcing-the-agenda-of-the-midonet-mini-summit-tokyo-2015/','127.0.0.1','2015-09-29 05:24:48','2015-09-29 05:24:48','[&#8230;] might have heard about the first-ever MidoNet Mini-Summit in Tokyo on October 26, 2015 &#8211; the day before OpenStack Summit Tokyo. But back when we announced it, we were still working [&#8230;]',0,'1','The Incutio XML-RPC PHP Library -- WordPress/4.3.1','pingback',0,0),(514,482,'Announcing the Agenda of the MidoNet Mini-Summit Tokyo | GREENSTACK','','http://greenstack.die.upm.es/2015/09/29/announcing-the-agenda-of-the-midonet-mini-summit-tokyo/','138.4.9.36','2015-09-30 00:18:08','2015-09-30 00:18:08','[&#8230;] might have heard about the first-ever MidoNet Mini-Summit in Tokyo on October 26, 2015 &ndash; the day before OpenStack Summit Tokyo. But back when we announced it, we were still working [&#8230;]',0,'1','The Incutio XML-RPC PHP Library -- WordPress/4.3.1','pingback',0,0),(546,529,'Multi-Host Networking is now ready for production | Docker Blog','','http://blog.docker.com/2015/11/docker-multi-host-networking-ga/','173.236.235.175','2015-11-03 23:27:50','2015-11-03 23:27:50','[&#8230;] these plugins that are already available from our partners Weave, Project Calico, VMware, Cisco, Midokura and [&#8230;]',0,'1','The Incutio XML-RPC PHP Library -- WordPress/4.3.1','pingback',0,0);
+/*!40000 ALTER TABLE `wp_comments` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
