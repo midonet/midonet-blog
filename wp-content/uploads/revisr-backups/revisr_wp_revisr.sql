@@ -19,12 +19,12 @@ CREATE TABLE `wp_revisr` (
   `event` varchar(42) NOT NULL,
   `user` varchar(60) DEFAULT NULL,
   UNIQUE KEY `id` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `wp_revisr` WRITE;
 /*!40000 ALTER TABLE `wp_revisr` DISABLE KEYS */;
-INSERT INTO `wp_revisr` VALUES (1,'2015-11-26 03:41:12','Successfully created a new repository.','init','Sandro_Mathys'),(2,'2015-11-26 03:43:36','Successfully backed up the database.','backup','Revisr Bot'),(3,'2015-11-26 03:43:37','The weekly backup was successful.','backup','Revisr Bot'),(4,'2015-11-26 03:50:03','Error pushing changes to the remote repository.','error','Sandro_Mathys'),(5,'2015-11-26 04:08:19','Error pushing changes to the remote repository.','error','Sandro_Mathys'),(6,'2015-11-26 04:10:45','Successfully pushed 5 commits to origin/master.','push','Sandro_Mathys'),(7,'2015-11-26 06:36:36','Successfully pushed 1 commit to origin/master.','push','Sandro_Mathys'),(8,'2015-11-26 08:50:47','Successfully pushed 0 commits to origin/master.','push','Sandro_Mathys'),(9,'2015-11-26 08:55:56','Discarded all uncommitted changes.','discard','Sandro_Mathys'),(10,'2015-11-26 08:59:52','Successfully pushed 0 commits to origin/master.','push','Sandro_Mathys');
+INSERT INTO `wp_revisr` VALUES (1,'2015-11-26 03:41:12','Successfully created a new repository.','init','Sandro_Mathys'),(2,'2015-11-27 03:08:30','Successfully backed up the database.','backup','Sandro_Mathys'),(3,'2015-11-27 03:08:30','There was an error committing the changes to the local repository.','error','Sandro_Mathys'),(4,'2015-11-27 03:09:07','There was an error committing the changes to the local repository.','error','Sandro_Mathys'),(5,'2015-11-27 03:11:23','There was an error committing the changes to the local repository.','error','Sandro_Mathys'),(6,'2015-11-27 03:11:40','There was an error committing the changes to the local repository.','error','Sandro_Mathys'),(7,'2015-11-27 03:12:30','There was an error committing the changes to the local repository.','error','Sandro_Mathys'),(8,'2015-11-27 03:22:33','There was an error committing the changes to the local repository.','error','Sandro_Mathys'),(9,'2015-11-27 03:23:13','There was an error committing the changes to the local repository.','error','Sandro_Mathys'),(10,'2015-11-27 03:28:02','There was an error committing the changes to the local repository.','error','Sandro_Mathys'),(11,'2015-11-27 03:31:06','There was an error committing the changes to the local repository.','error','Sandro_Mathys');
 /*!40000 ALTER TABLE `wp_revisr` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
