@@ -1,5 +1,5 @@
 /*
- * Hard-coded / Fixed Constants:
+ * hard-coded / fixed constants
  */
 WPSSO_FILEPATH
 WPSSO_PLUGINDIR
@@ -7,10 +7,7 @@ WPSSO_PLUGINBASE
 WPSSO_URLPATH
 WPSSO_NONCE
 /*
- * Variable Constants:
- *
- * These constants can be pre-defined in your wp-config.php file to modify
- * their default values (shown here).
+ * variable constants - can be pre-defined in wp-config.php file to modify default values
  */
 WPSSO_CACHEDIR			= WPSSO_PLUGINDIR.'cache/'
 WPSSO_TOPICS_LIST		= WPSSO_PLUGINDIR.'share/topics.txt'

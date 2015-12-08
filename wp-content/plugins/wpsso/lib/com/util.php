@@ -50,6 +50,14 @@ if ( ! class_exists( 'SucomUtil' ) ) {
 			return false;
 		}
 
+		public static function sanitize_hookname( $name ) {
+			return str_replace( array( '/', '-' ), '_', $name );
+		}
+
+		public static function sanitize_classname( $name ) {
+			return str_replace( array( '/', '-' ), '', $name );
+		}
+
 		public static function sanitize_tag( $tag ) {
 			$tag = sanitize_title_with_dashes( $tag, '', 'display' );
 			$tag = urldecode( $tag );
@@ -1044,7 +1052,7 @@ if ( ! class_exists( 'SucomUtil' ) ) {
 		// tab titles in the array should already be translated:
 		//
 		// $tabs = array(
-		//		'header' => _x( 'Title / Descriptions', 'metabox tab', 'nextgen-facebook' ),
+		//		'header' => _x( 'Descriptions', 'metabox tab', 'nextgen-facebook' ),
 		//		'media' => _x( 'Priority Media', 'metabox tab', 'nextgen-facebook' ),
 		//		'preview' => _x( 'Social Preview', 'metabox tab', 'nextgen-facebook' ),
 		//		'tags' => _x( 'Head Tags', 'metabox tab', 'nextgen-facebook' ),
@@ -1396,6 +1404,28 @@ if ( ! class_exists( 'SucomUtil' ) ) {
 					break;
 			}
 			asort( $ret );
+			return $ret;
+		}
+
+		public static function get_stripped_php ( $file ) {
+			$ret = '';
+			if ( file_exists( $file ) ) {
+				$php = file_get_contents( $file );
+				$comments = array(T_COMMENT); 
+				if ( defined( 'T_DOC_COMMENT' ) )
+					$comments[] = T_DOC_COMMENT;	// php 5
+				if ( defined( 'T_ML_COMMENT' ) )
+				        $comments[] = T_ML_COMMENT;	// php 4
+				$tokens = token_get_all( $php );
+				foreach ( $tokens as $token ) {
+					if ( is_array( $token ) ) {
+						if ( in_array( $token[0], $comments ) )
+							continue; 
+						$token = $token[1];
+					}
+					$ret .= $token;
+				}
+			} else $ret = false;
 			return $ret;
 		}
 	}

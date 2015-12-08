@@ -155,25 +155,20 @@ if ( ! class_exists( 'WpssoOptions' ) ) {
 					$this->save_options( $options_name, $opts, $network );
 
 					if ( is_admin() ) {
-						if ( empty( $opts['plugin_filter_content'] ) )
-							$this->p->notice->inf( $this->p->msgs->get( 'notice-content-filters-disabled' ), 
-								true, true, 'notice-content-filters-disabled', true );
-
-						/*
-						// save this check for a later version
-						if ( ! empty( $opts['plugin_head_attr_filter_name'] ) &&
-							$opts['plugin_head_attr_filter_name'] === 'language_attributes' )
-								$this->p->notice->inf( $this->p->msgs->get( 'notice-head-attr-filter-default' ), 
-									true, true, 'notice-head-attr-filter-default', true );
-						*/
-
 						if ( empty( $opts['plugin_object_cache_exp'] ) ||
 							$opts['plugin_object_cache_exp'] < $this->get_defaults( 'plugin_object_cache_exp' ) ) {
-
 							if ( $this->p->check->aop( $this->p->cf['lca'], true, $this->p->is_avail['aop'] ) )
 								$this->p->notice->inf( $this->p->msgs->get( 'notice-object-cache-exp' ), true );
 							else $opts['plugin_object_cache_exp'] = $this->get_defaults( 'plugin_object_cache_exp' );
 						}
+
+						if ( empty( $opts['plugin_filter_content'] ) )
+							$this->p->notice->inf( $this->p->msgs->get( 'notice-content-filters-disabled' ), 
+								true, true, 'notice-content-filters-disabled', true );
+
+						if ( ! empty( $this->p->options['plugin_head_attr_filter_name'] ) &&
+							$this->p->options['plugin_head_attr_filter_name'] === 'head_attributes' )
+								$this->p->admin->head_attr_filter_check();
 					}
 				}
 
@@ -291,6 +286,10 @@ if ( ! class_exists( 'WpssoOptions' ) ) {
 				}
 			}
 
+			if ( ! empty( $opts['fb_app_id'] ) && 
+				( ! is_numeric( $opts['fb_app_id'] ) || strlen( $opts['fb_app_id'] ) > 32 ) )
+					$this->p->notice->err( sprintf( __( 'The Facebook App ID must be numeric and 32 characters or less in length &mdash; the value of "%s" is not valid.', 'wpsso' ), $opts['fb_app_id'] ), true );
+
 			return $opts;
 		}
 
@@ -322,8 +321,9 @@ if ( ! class_exists( 'WpssoOptions' ) ) {
 					if ( $this->p->debug->enabled )
 						$this->p->debug->log( 'upgraded '.$options_name.' settings have been saved' );
 
-					$this->p->notice->inf( sprintf( __( 'Plugin settings (%s) have been upgraded and saved.',
-						'wpsso' ), $options_name ), true );
+					if ( is_admin() )
+						$this->p->notice->inf( sprintf( __( 'Plugin settings (%s) have been upgraded and saved.',
+							'wpsso' ), $options_name ), true );
 				}
 			} else {
 				if ( $this->p->debug->enabled )
@@ -334,12 +334,9 @@ if ( ! class_exists( 'WpssoOptions' ) ) {
 		}
 
 		public function filter_option_type( $type, $key ) {
+
 			if ( ! empty( $type ) )
 				return $type;
-
-			// remove localization for more generic match
-			if ( strpos( $key, '#' ) !== false )
-				$key = preg_replace( '/#.*$/', '', $key );
 
 			switch ( $key ) {
 				case 'og_vid_embed':
@@ -361,6 +358,7 @@ if ( ! class_exists( 'WpssoOptions' ) ) {
 					break;
 				// must be a url
 				case 'seo_publisher_url':
+				case 'fb_page_url':
 				case 'fb_publisher_url':
 				case 'schema_logo_url':
 				case 'og_def_img_url':
@@ -368,6 +366,7 @@ if ( ! class_exists( 'WpssoOptions' ) ) {
 					return 'url';
 					break;
 				// must be numeric (blank or zero is ok)
+				case 'fb_app_id':
 				case 'og_img_id':
 				case 'og_def_img_id':
 				case 'og_def_author_id':
@@ -397,6 +396,7 @@ if ( ! class_exists( 'WpssoOptions' ) ) {
 					return 'textured';
 					break;
 				// must be alpha-numeric (upper or lower case)
+				case 'fb_app_secret':
 				case 'rp_dom_verify':
 				case ( preg_match( '/_api_key$/', $key ) ? true : false ):
 					return 'api_key';
@@ -413,7 +413,6 @@ if ( ! class_exists( 'WpssoOptions' ) ) {
 				case 'og_site_description':
 				case 'schema_desc':
 				case 'seo_desc':
-				case 'fb_app_id':
 				case 'tc_desc':
 				case 'plugin_img_alt_prefix':
 				case 'plugin_p_cap_prefix':
