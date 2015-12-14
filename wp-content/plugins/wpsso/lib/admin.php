@@ -42,10 +42,9 @@ if ( ! class_exists( 'WpssoAdmin' ) ) {
 				add_action( 'admin_menu', array( &$this, 'add_admin_menus' ), WPSSO_ADD_MENU_PRIORITY );
 				add_action( 'admin_menu', array( &$this, 'add_admin_settings' ), WPSSO_ADD_SETTINGS_PRIORITY );
 				add_action( 'activated_plugin', array( &$this, 'check_activated_plugin' ), 10, 2 );
-				add_action( 'after_switch_theme', array( &$this, 'head_attr_filter_check' ) );
-				add_action( 'upgrader_process_complete', array( &$this, 'head_attr_filter_check' ) );
+				add_action( 'after_switch_theme', array( &$this, 'check_tmpl_head_elements' ) );
+				add_action( 'upgrader_process_complete', array( &$this, 'check_tmpl_head_elements' ) );
 
-				add_filter( 'current_screen', array( &$this, 'screen_notices' ) );
 				add_filter( 'plugin_action_links', array( &$this, 'add_plugin_action_links' ), 10, 2 );
 	
 				if ( is_multisite() ) {
@@ -91,75 +90,14 @@ if ( ! class_exists( 'WpssoAdmin' ) ) {
 			}
 		}
 
-		public function screen_notices( $screen ) {
-			$screen_id = SucomUtil::get_screen_id( $screen );
-			switch ( $screen_id ) {
-				case 'dashboard':
-				case ( strpos( $screen_id, '_page_'.$this->p->cf['lca'].'-' ) !== false ? true : false ):
-					$this->timed_notices();
-					break;
-			}
-		}
-
-		public function timed_notices( $store = false ) {
-			if ( ! $this->p->notice->can_dismiss() ||			// true for wordpress 4.2+
-				! current_user_can( 'manage_options' ) )
-					return;
-
-			global $wp_version;
-			$user_id = get_current_user_id();
-			$dis_arr = empty( $user_id ) ? false : 			// just in case
-				get_user_option( WPSSO_DISMISS_NAME, $user_id );	// get dismissed message ids
-			$ts = $this->p->util->get_all_times();
-			$now_time = time();
-			$days = $now_time - ( $this->p->cf['form']['time_by_name']['day'] * 5 );
-			$weeks = $now_time - ( $this->p->cf['form']['time_by_name']['day'] * 21 );
-			$type = 'inf';
-
-			foreach ( $this->p->cf['plugin'] as $ext => $info ) {
-				if ( empty( $info['version'] ) ||		// must be an active plugin
-					empty( $info['url']['review'] ) )	// must be hosted on wordpress.org
-						continue;
-
-				$msg_id_works = 'ask-'.$ext.'-'.$info['version'].'-plugin-works';	// unique for every version
-				$msg_id_review = 'ask-'.$ext.'-plugin-review';
-				$help_links = '<li>'.__( 'Got questions or need some help?', 'wpsso' );
-
-				if ( ! empty( $info['url']['pro_support'] ) && 
-					$this->p->check->aop( $ext, true, $this->p->is_avail['aop'] ) )
-						$help_links .= ' <a href="'.$info['url']['pro_support'].'" target="_blank">'.
-							sprintf( __( 'Open a new ticket on the %s support website.',
-								'wpsso' ), $info['short'].self::$is_suffix ).'</a>';
-				elseif ( ! empty( $info['url']['wp_support'] ) )
-					$help_links .= ' <a href="'.$info['url']['wp_support'].'" target="_blank">'.
-						sprintf( __( 'Open a new thread in the %s version support forum.',
-							'wpsso' ), $info['short'].self::$is_suffix ).'</a>';
-				$help_links .= '</li>';
-
-				if ( ! isset( $dis_arr[$type.'_'.$msg_id_works] ) && 
-					isset( $ts[$ext.'_update_time'] ) && 
-						$ts[$ext.'_update_time'] < $days ) {
-
-					$this->p->notice->log( $type, '<b>'.__( 'Excellent!', 'wpsso' ).'</b> '.sprintf( __( 'It looks like you\'ve been running <b>%1$s version %2$s</b> for several days &mdash; is it working well with <b>WordPress version %3$s</b>?', 'wpsso' ), $info['name'], $info['version'], $wp_version ).'<ul><li><a href="https://wordpress.org/plugins/'.$info['slug'].'/?compatibility[version]='.$wp_version.'&compatibility[topic_version]='.$info['version'].'&compatibility[compatible]=1" target="_blank">'.__( 'Let us know with a "Works" vote on WordPress.org!', 'wpsso' ).'</a></li>'.$help_links.'</ul>', $store, $user_id, $msg_id_works, true, array( 'label' => false ) );
-
-				} elseif ( ! isset( $dis_arr[$type.'_'.$msg_id_review] ) && 
-					isset( $ts[$ext.'_install_time'] ) && 
-						$ts[$ext.'_install_time'] < $weeks ) {
-
-					$this->p->notice->log( $type, '<b>'.__( 'Fantastic!', 'wpsso' ).'</b> '.sprintf( __( 'It looks like you\'ve been running <b>%s</b> for several weeks &mdash; how do you like it so far?', 'wpsso' ), $info['name'] ).'<ul><li><a href="'.$info['url']['review'].'" target="_blank">'.__( 'Let us know with a 5-star rating and a few encouraging words on wordpress.org!', 'wpsso' ).'</a> ;-)</li>'.$help_links.'</ul>', $store, $user_id, $msg_id_review, true, array( 'label' => false ) );
-				}
-			}
-		}
-
 		private function pro_req_notices() {
-			// check that wpsso pro has an authentication id
 			$lca = $this->p->cf['lca'];
 			if ( $this->p->is_avail['aop'] === true && 
 				empty( $this->p->options['plugin_'.$lca.'_tid'] ) && 
 					( empty( $this->p->options['plugin_'.$lca.'_tid:is'] ) || 
 						$this->p->options['plugin_'.$lca.'_tid:is'] !== 'disabled' ) )
 							$this->p->notice->nag( $this->p->msgs->get( 'notice-pro-tid-missing' ) );
-			// check all *active* plugins / extensions to make sure pro version is installed
+
 			$has_tid = false;
 			foreach ( $this->p->cf['plugin'] as $ext => $info ) {
 				if ( ! empty( $this->p->options['plugin_'.$ext.'_tid'] ) &&
@@ -170,7 +108,7 @@ if ( ! class_exists( 'WpssoAdmin' ) ) {
 							array( 'lca' => $ext ) ), true );
 				}
 			}
-			// if we have at least one tid, make sure the update manager is installed
+
 			if ( $has_tid === true && ! $this->p->is_avail['util']['um'] ) {
 				if ( ! function_exists( 'get_plugins' ) )
 					require_once( ABSPATH.'wp-admin/includes/plugin.php' );
@@ -256,11 +194,11 @@ if ( ! class_exists( 'WpssoAdmin' ) ) {
 				$this->p->cf['menu'].self::$is_suffix, 
 				'manage_options', 
 				$menu_slug, 
-				array( &$this, 'show_form_page' ), 
+				array( &$this, 'show_setting_page' ), 
 				( version_compare( $wp_version, 3.8, '<' ) ? null : 'dashicons-share' ),
 				WPSSO_MENU_ORDER
 			);
-			add_action( 'load-'.$this->pagehook, array( &$this, 'load_form_page' ) );
+			add_action( 'load-'.$this->pagehook, array( &$this, 'load_setting_page' ) );
 		}
 
 		protected function add_submenu_page( $parent_slug, $menu_id = false, $menu_name = false ) {
@@ -291,7 +229,7 @@ if ( ! class_exists( 'WpssoAdmin' ) ) {
 				else $menu_title = $menu_name;
 				$menu_slug = $lca.'-'.$menu_id;
 				$page_title = $short.self::$is_suffix.' &mdash; '.$menu_title;
-				$function = array( &$this, 'show_form_page' );
+				$function = array( &$this, 'show_setting_page' );
 			}
 			// add_submenu_page( $parent_slug, $page_title, $menu_title, $capability, $menu_slug, $function );
 			$this->pagehook = add_submenu_page( 
@@ -303,7 +241,7 @@ if ( ! class_exists( 'WpssoAdmin' ) ) {
 				$function
 			);
 			if ( $function )
-				add_action( 'load-'.$this->pagehook, array( &$this, 'load_form_page' ) );
+				add_action( 'load-'.$this->pagehook, array( &$this, 'load_setting_page' ) );
 		}
 
 		// add links on the main plugins page
@@ -374,7 +312,7 @@ if ( ! class_exists( 'WpssoAdmin' ) ) {
 				sprintf( __( 'Wait %1$d seconds for cache objects to expire or <a href="%2$s">%3$s</a> now.',
 					'wpsso' ), $this->p->options['plugin_object_cache_exp'], $clear_cache_link,
 						_x( 'Clear All Cache(s)', 'submit button', 'wpsso' ) ), true );
-			$this->head_attr_filter_check();
+			$this->check_tmpl_head_elements();
 			return $opts;
 		}
 
@@ -418,20 +356,21 @@ if ( ! class_exists( 'WpssoAdmin' ) ) {
 			$this->p->admin->submenu[$this->menu_id]->add_meta_boxes();
 		}
 
-		public function load_form_page() {
+		public function load_setting_page() {
 			$lca = $this->p->cf['lca'];
-			$action = $lca.'-action';
+			$action_query = $lca.'-action';
 			wp_enqueue_script( 'postbox' );
 
-			if ( ! empty( $_GET[$action] ) ) {
+			if ( ! empty( $_GET[$action_query] ) ) {
+				$action_name = SucomUtil::sanitize_hookname( $_GET[$action_query] );
 				if ( empty( $_GET[ WPSSO_NONCE ] ) ) {
 					if ( $this->p->debug->enabled )
 						$this->p->debug->log( 'nonce token validation query field missing' );
 				} elseif ( ! wp_verify_nonce( $_GET[ WPSSO_NONCE ], self::get_nonce() ) ) {
-					$this->p->notice->err( __( 'Nonce token validation failed for plugin action (action ignored).', 'wpsso' ) );
+					$this->p->notice->err( __( 'Nonce token validation failed for action \"'.$action_name.'\".', 'wpsso' ) );
 				} else {
-					$_SERVER['REQUEST_URI'] = remove_query_arg( array( $action, WPSSO_NONCE ) );
-					switch ( $_GET[$action] ) {
+					$_SERVER['REQUEST_URI'] = remove_query_arg( array( $action_query, WPSSO_NONCE ) );
+					switch ( $action_name ) {
 						case 'check_for_updates': 
 							if ( $this->p->is_avail['util']['um'] ) {
 								self::$readme_info = array();
@@ -469,12 +408,13 @@ if ( ! class_exists( 'WpssoAdmin' ) ) {
 							$_SERVER['REQUEST_URI'] = remove_query_arg( array( 'show-opts' ) );
 							break;
 
-						case 'head_attr_filter_update': 
-							$this->head_attr_filter_update();
+						case 'modify_tmpl_head_elements': 
+							$this->modify_tmpl_head_elements();
 							break;
 
 						default: 
-							do_action( $lca.'_form_page_query_'.$_GET[$action] );
+							do_action( $lca.'_load_setting_page_'.$action_name, 
+								$this->pagehook, $this->menu_id, $this->menu_name );
 							break;
 					}
 				}
@@ -543,7 +483,7 @@ if ( ! class_exists( 'WpssoAdmin' ) ) {
 			<?php
 		}
 
-		public function show_form_page() {
+		public function show_setting_page() {
 
 			if ( ! $this->is_setting( $this->menu_id ) )	// the "setting" pages display their own error messages
 				settings_errors( WPSSO_OPTIONS_NAME );	// display "error" and "updated" messages
@@ -601,20 +541,17 @@ if ( ! class_exists( 'WpssoAdmin' ) ) {
 				$this->is_setting( $this->menu_id ) ) {
 
 				echo '<form name="'.$this->p->cf['lca'].'" id="'.
-					$this->p->cf['lca'].'_settings_form" action="options.php" method="post">'."\n";
-
+					$this->p->cf['lca'].'_setting_form" action="options.php" method="post">'."\n";
 				settings_fields( $this->p->cf['lca'].'_setting' ); 
 
 			} elseif ( $this->is_sitesubmenu( $this->menu_id ) ) {
 
 				echo '<form name="'.$this->p->cf['lca'].'" id="'.
-					$this->p->cf['lca'].'_settings_form" action="edit.php?action='.
+					$this->p->cf['lca'].'_setting_form" action="edit.php?action='.
 						WPSSO_SITE_OPTIONS_NAME.'" method="post">'."\n";
 				echo '<input type="hidden" name="page" value="'.$this->menu_id.'">';
 			}
 
-			// wp_nonce_field( $action, $name, $referer, $echo
-			// $name = the hidden form field to be created (aka $_POST[$name]).
 			wp_nonce_field( self::get_nonce(), WPSSO_NONCE );
 			wp_nonce_field( 'closedpostboxes', 'closedpostboxesnonce', false );
 			wp_nonce_field( 'meta-box-order', 'meta-box-order-nonce', false );
@@ -650,7 +587,7 @@ if ( ! class_exists( 'WpssoAdmin' ) ) {
 				$latest_notice = '';
 				$changelog_url = $info['url']['changelog'];
 
-				// the readme_info array is populated by set_readme_info(), which is called from load_form_page()
+				// the readme_info array is populated by set_readme_info(), which is called from load_setting_page()
 				if ( ! empty( self::$readme_info[$ext]['stable_tag'] ) ) {
 					$stable_version = self::$readme_info[$ext]['stable_tag'];
 					$upgrade_notice = self::$readme_info[$ext]['upgrade_notice'];
@@ -1171,69 +1108,61 @@ if ( ! class_exists( 'WpssoAdmin' ) ) {
 			}
 		}
 
-		public function head_attr_filter_check() {
-			if ( empty( $this->p->options['plugin_head_attr_filter_name'] ) )
-				return;
+		public function check_tmpl_head_elements() {
+			// only check if using the default filter name
+			if ( empty( $this->p->options['plugin_head_attr_filter_name'] ) ||
+				$this->p->options['plugin_head_attr_filter_name'] !== 'head_attributes' )
+					return;
 
-			if ( $this->p->debug->enabled )
-				$this->p->debug->mark( 'check header.php' );
+			$headers = glob( get_stylesheet_directory().'/header*.php' );
+			foreach ( $headers as $file ) {
+				if ( ( $html = SucomUtil::get_stripped_php( $file ) ) === false )
+					continue;
 
-			$file = get_stylesheet_directory().'/header.php';
-			$html = SucomUtil::get_stripped_php( $file );
-
-			if ( $html === false ) {
-				if ( $this->p->debug->enabled )
-					$this->p->debug->log( 'exiting early: header.php not found' );
-				return;
-			}
-
-			if ( $this->p->options['plugin_head_attr_filter_name'] === 'head_attributes' ) {
 				if ( strpos( $html, '<head>' ) !== false ) {
-					if ( $this->p->debug->enabled )
-						$this->p->debug->log( 'header.php contains an un-modified head element' );
-					$this->p->notice->err( $this->p->msgs->get( 'notice-header-tmpl-default-head' ),
-						true, true, 'notice-header-tmpl-default-head', true );
+					$this->p->notice->err( $this->p->msgs->get( 'notice-header-tmpl-no-head-attr' ),
+						true, true, 'notice-header-tmpl-no-head-attr', false );
+					break;
 				}
 			}
-
-			if ( $this->p->debug->enabled )
-				$this->p->debug->mark( 'check header.php' );
 		}
 
-		public function head_attr_filter_update() {
+		public function modify_tmpl_head_elements() {
+			$headers = glob( get_stylesheet_directory().'/header*.php' );
+			foreach ( $headers as $file ) {
+				$base = basename( $file );
+				$backup = $file.'~backup-'.date( 'Ymd-His' );
 
-			$file = get_stylesheet_directory().'/header.php';
-			$backup = $file.'~backup-'.date( 'Ymd-His' );
+				// double check in case of reloads etc.
+				if ( ( $html = SucomUtil::get_stripped_php( $file ) ) === false ||
+					strpos( $html, '<head>' ) === false ) {
+					$this->p->notice->err( sprintf( __( '&lt;head&gt; element not found in %s.',
+						'wpsso' ), $file ), true );
+					continue;
+				}
 
-			if ( ! file_exists( $file ) )
-				return;
+				// make a backup of the original
+				if ( ! copy( $file, $backup ) ) {
+					$this->p->notice->err( sprintf( __( 'Error copying %1$s to %2$s.',
+						'wpsso' ), 'header.php', $backup ), true );
+					continue;
+				}
 
-			// double check in case of reloads etc.
-			if ( ( $html = SucomUtil::get_stripped_php( $file ) ) === false ||
-				strpos( $html, '<head>' ) === false ) {
-				$this->p->notice->err( sprintf( __( 'No update possible - an un-modified &lt;head&gt; element was not found in %s.', 'wpsso' ), $file ), true );
-				return;
+				$php = file_get_contents( $file );
+				$php = str_replace( '<head>', '<head <?php do_action( \'add_head_attributes\' ); ?>>', $php );
+
+				if ( ! $fh = @fopen( $file, 'wb' ) ) {
+					$this->p->notice->err( sprintf( __( 'Failed to open file %s for writing.',
+						'wpsso' ), $file ), true );
+					continue;
+				}
+				
+				if ( fwrite( $fh, $php ) ) {
+					fclose( $fh );
+					$this->p->notice->inf( sprintf( __( 'The %1$s template has been successfully updated and saved. A backup copy of the original template is available in %2$s.', 'wpsso' ), $base, $backup ), true );
+				}
 			}
-
-			// make a backup of the original
-			if ( ! copy( $file, $backup ) ) {
-				$this->p->notice->err( sprintf( __( 'Error copying %1$s to %2$s.', 'wpsso' ), 'header.php', $backup ), true );
-				return;
-			}
-
-			$php = file_get_contents( $file );
-			$php = str_replace( '<head>', '<head <?php echo apply_filters( \'head_attributes\', \'\' ); ?>>', $php );
-
-			if ( ! $fh = @fopen( $file, 'wb' ) ) {
-				$this->p->notice->err( sprintf( __( 'Failed to open file %s for writing.', 'wpsso' ), $file ), true );
-				return;
-			}
-			
-			if ( fwrite( $fh, $php ) ) {
-				fclose( $fh );
-				$this->p->notice->trunc_id( 'notice-header-tmpl-default-head' );
-				$this->p->notice->inf( '<p><b>'.__( 'The header.php theme template has been successfully updated and saved.', 'wpsso' ).'</b></p><p>'.sprintf( __( 'A backup copy of your original header.php is available in %s.', 'wpsso' ), $backup ).'</p>', true );
-			}
+			$this->p->notice->trunc_id( 'notice-header-tmpl-no-head-attr' );	// just in case
 		}
 
 		// dismiss an incorrect yoast seo conflict notification

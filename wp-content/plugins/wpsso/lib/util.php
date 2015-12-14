@@ -196,37 +196,26 @@ if ( ! class_exists( 'WpssoUtil' ) && class_exists( 'SucomUtil' ) ) {
 			}
 		}
 
-		public function push_add_to_options( &$opts = array(),
-			$add_to_prefixes = array( 'plugin' => 'backend' ), $default = 1 ) {
+		public function add_ptns_to_opts( &$opts = array(), $prefixes, $default = 1 ) {
+			if ( ! is_array( $prefixes ) )
+				$prefixes = array( $prefixes => $default );
 
-			foreach ( $add_to_prefixes as $opt_prefix => $type ) {
-				foreach ( $this->get_post_types( $type ) as $post_type ) {
-					$option_name = $opt_prefix.'_add_to_'.$post_type->name;
-					$filter_name = $this->p->cf['lca'].'_add_to_options_'.$post_type->name;
-					if ( ! isset( $opts[$option_name] ) )
-						$opts[$option_name] = apply_filters( $filter_name, $default );
+			foreach ( $prefixes as $opt_pre => $def_val ) {
+				foreach ( $this->get_post_types() as $post_type ) {
+					$idx = $opt_pre.'_'.$post_type->name;
+					if ( ! isset( $opts[$idx] ) )
+						$opts[$idx] = $def_val;
 				}
 			}
 			return $opts;
 		}
 
-		public function get_post_types( $type = 'frontend', $output = 'objects' ) {
-			switch ( $type ) {
-				case 'frontend':
-					$post_types = get_post_types( array( 'public' => true ), $output );
-					break;
-				case 'backend':
-					$post_types = get_post_types( array( 'public' => true, 'show_ui' => true ), $output );
-					break;
-				default:
-					$post_types = array();
-					break;
-			}
-			return apply_filters( $this->p->cf['lca'].'_post_types', $post_types, $type, $output );
+		public function get_post_types( $output = 'objects' ) {
+			return apply_filters( $this->p->cf['lca'].'_post_types', 
+				get_post_types( array( 'public' => true ), $output ), $output );
 		}
 
 		public function clear_all_cache() {
-
 			wp_cache_flush();					// clear non-database transients as well
 
 			$lca = $this->p->cf['lca'];
@@ -264,6 +253,8 @@ if ( ! class_exists( 'WpssoUtil' ) && class_exists( 'SucomUtil' ) ) {
 					$permalink = get_permalink( $post_id );
 					$permalink_no_meta = add_query_arg( array( 'WPSSO_META_TAGS_DISABLE' => 1 ), $permalink );
 					$sharing_url = $this->p->util->get_sharing_url( $post_id );
+
+					// transients persist from one page load to another
 					$transients = array(
 						'SucomCache::get' => array(
 							'url:'.$permalink,
@@ -275,11 +266,13 @@ if ( ! class_exists( 'WpssoUtil' ) && class_exists( 'SucomUtil' ) ) {
 						),
 						'WpssoMeta::get_mod_column_content' => array( 
 							'lang:'.$lang.'_id:'.$post_id.'_mod:post_column:'.$lca.'_og_image',
+							'lang:'.$lang.'_id:'.$post_id.'_mod:post_column:'.$lca.'_og_desc',
 						),
 					);
 					$transients = apply_filters( $lca.'_post_cache_transients', 
 						$transients, $post_id, $lang, $sharing_url );
-	
+
+					// wp objects are only available for the duration of a single page load
 					$objects = array(
 						'SucomWebpage::get_content' => array(
 							'lang:'.$lang.'_post:'.$post_id.'_filtered',
@@ -519,8 +512,8 @@ if ( ! class_exists( 'WpssoUtil' ) && class_exists( 'SucomUtil' ) ) {
 					}
 					break;
 				// options that cannot be blank
-				case 'not_blank':
 				case 'code':
+				case 'not_blank':
 					if ( $val === '' ) {
 						$this->p->notice->err( sprintf( 'The value of option \'%s\' cannot be empty - resetting the option to its default value.', $key ), true );
 						$val = $def_val;
@@ -818,6 +811,11 @@ if ( ! class_exists( 'WpssoUtil' ) && class_exists( 'SucomUtil' ) ) {
 				}
 			}
 			return array( $id, $obj );
+		}
+
+		// deprecated 2015/12/09
+		public function push_add_to_options( &$opts, $arr = array(), $def = 1 ) {
+			return $opts;
 		}
 	}
 }

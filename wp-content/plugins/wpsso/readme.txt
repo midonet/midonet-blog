@@ -9,8 +9,8 @@ Tags: attached, bbPress, buddypress, e-commerce, easy digital downloads, edd, Fa
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.txt
 Requires At Least: 3.1
-Tested Up To: 4.3.1
-Stable Tag: 3.17.0
+Tested Up To: 4.4
+Stable Tag: 3.18.1
 
 Fast, light-weight, full-featured plugin for great looking shares on all social sites - no matter how your content is shared or re-shared!
 
@@ -295,7 +295,6 @@ Follow Surnia Ulula on [Google+](https://plus.google.com/+SurniaUlula/?rel=autho
 		* [Filter Examples](http://wpsso.com/codex/plugins/wpsso/notes/developer/filters/examples/)
 			* [Detect YouTube URL Links as Videos](http://wpsso.com/codex/plugins/wpsso/notes/developer/filters/examples/detect-youtube-url-links-as-videos/)
 			* [Disable the Social Settings Metabox by Post ID](http://wpsso.com/codex/plugins/wpsso/notes/developer/filters/examples/disable-the-social-settings-metabox-by-post-id/)
-			* [Force Wistia Videos to Autoplay on Facebook](http://wpsso.com/codex/plugins/wpsso/notes/developer/filters/examples/force-wistia-videos-to-autoplay-on-facebook/)
 			* [Modify the article:tag Keywords / Names](http://wpsso.com/codex/plugins/wpsso/notes/developer/filters/examples/modify-the-articletag-keywords-names/)
 			* [Modify the Default Topics List](http://wpsso.com/codex/plugins/wpsso/notes/developer/filters/examples/modify-the-default-topics-list/)
 			* [Modify the Home Page Title for Facebook / Open Graph](http://wpsso.com/codex/plugins/wpsso/notes/developer/filters/examples/modify-the-home-page-title-for-facebook-open-graph/)
@@ -344,6 +343,61 @@ This release schedule keeps the code stable and reliable, at the cost of more fr
 * [GitHub](https://github.com/SurniaUlula/wpsso)
 * [WordPress.org](https://wordpress.org/plugins/wpsso/developers/)
 
+= Version 3.19.0 (TBD) =
+
+Official announcement: N/A
+
+* **New Features**
+	* Added a new "Author Name Format" option under the Google / Schema tab on the General settings page.
+	* Added a schema ImageObject with URL, width, and height information for JSON and noscript meta tags.
+* **Improvements**
+	* *None*
+* **Bugfixes**
+	* *None*
+* **Developer Notes**
+	* Added new filter hooks for the LD+JSON schema scripts:
+		* 'wpsso_json_http_schema_org_organization'
+		* 'wpsso_json_http_schema_org_person'
+		* 'wpsso_json_http_schema_org_website'
+		* 'wpsso_json_http_schema_org_{item_type}'
+	* Renamed the WpssoUser `get_article_author()` method to `get_author_profile_url()`.
+	* Refactored the WpssoSchema class and JSON related sections of the WpssoUser class.
+	* Added a call to `getimagesize()` when saving options to retrieve image dimensions from URLs (default image URL, schema logo URL, etc.).
+
+= Version 3.18.1 (2015/12/11) =
+
+Official announcement: http://wpsso.com/2015/12/12/wpsso-update-schema-type-by-post-type/
+
+* **New Features**
+	* *None*
+* **Improvements**
+	* Enabled all fields in the Social Settings metabox when editing a non-auto-draft Post / Page (previously, some fields were only enabled for published Posts / Pages).
+* **Bugfixes**
+	* *None*
+* **Developer Notes**
+	* *None*
+
+= Version 3.18.0 (2015/12/09) =
+
+Official announcement: N/A
+
+* **New Features**
+	* Added a new "Schema Item Type by Post Type" option to select the Schema item type for each post type.
+* **Improvements**
+	* Checks for head HTML elements without attribute filters - along with its template update process - are now done on all header templates, not just the header.php file.
+* **Bugfixes**
+	* *None*
+* **Developer Notes**
+	* Added a new `Sucom::sanitize_key()` method (returns a lower case string with alpha-numeric, hypens, and underscores).
+	* Refactored the post, user, and taxonomy meta code to support action hooks for URL query arguments, and improve loading / parsing of head meta tags.
+	* Renamed the WpssoOptions method `push_add_to_options()` to `add_ptns_to_opts()` and changed its arguments (breaking change - not backwards compatible).
+	* Changed the WpssoUtil `get_post_types()` arguments as well (breaking change - not backwards compatible).
+	* Renamed several WpssoAmin methods:
+		* `load_form_page()` to `load_setting_page()`.
+		* `show_form_page()` to `show_setting_page()`
+		* `head_attr_filter_check()` to `check_tmpl_head_elements()`
+		* `head_attr_filter_update()` to `modify_tmpl_head_elements()`
+
 = Version 3.17.0 (2015/12/06) =
 
 Official announcement: http://surniaulula.com/2015/12/06/ngfb-wpsso-update-improvements-video-autoplay/
@@ -378,7 +432,15 @@ Official announcement: http://surniaulula.com/2015/11/28/ngfb-wpsso-update-new-h
 
 == Upgrade Notice ==
 
-= 3.17.0 =
+= 3.19.0 =
 
-2015/12/06 Added new options to manage video autoplay, and include/exclude tabs in the Social Settings metabox. Refactored video integration modules and improved the Head Tags listing in the Social Settings metabox.
+TBD - Added a new Google / Schema "Author Name Format" option. Additional schema and JSON improvements, including new JSON filter hooks.
+
+= 3.18.1 =
+
+2015/12/11 - Enabled all fields in the Social Settings metabox when editing a non-auto-draft Post / Page.
+
+= 3.18.0 =
+
+2015/12/09 - Added a new "Schema Item Type by Post Type" option, improved head HTML element checks in theme templates, refactored the post, user, and taxonomy meta code.
 
