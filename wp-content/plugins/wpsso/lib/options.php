@@ -2,7 +2,7 @@
 /*
  * License: GPLv3
  * License URI: http://www.gnu.org/licenses/gpl.txt
- * Copyright 2012-2015 - Jean-Sebastien Morisset - http://surniaulula.com/
+ * Copyright 2012-2016 Jean-Sebastien Morisset (http://surniaulula.com/)
  */
 
 if ( ! defined( 'ABSPATH' ) ) 
@@ -29,7 +29,7 @@ if ( ! class_exists( 'WpssoOptions' ) ) {
 
 			if ( ! isset( $this->p->cf['opt']['defaults']['options_filtered'] ) ||
 				$this->p->cf['opt']['defaults']['options_filtered'] !== true ||
-				$force_filter === true ) {
+					$force_filter === true ) {
 
 				$lca = $this->p->cf['lca'];
 				$this->p->cf['opt']['defaults'] = $this->p->util->add_ptns_to_opts( $this->p->cf['opt']['defaults'], 
@@ -62,7 +62,7 @@ if ( ! class_exists( 'WpssoOptions' ) ) {
 			if ( $idx !== false ) 
 				if ( isset( $this->p->cf['opt']['defaults'][$idx] ) )
 					return $this->p->cf['opt']['defaults'][$idx];
-				else return false;
+				else return null;
 			else return $this->p->cf['opt']['defaults'];
 		}
 
@@ -70,7 +70,7 @@ if ( ! class_exists( 'WpssoOptions' ) ) {
 
 			if ( ! isset( $this->p->cf['opt']['site_defaults']['options_filtered'] ) ||
 				$this->p->cf['opt']['site_defaults']['options_filtered'] !== true ||
-				$force_filter === true ) {
+					$force_filter === true ) {
 
 				$lca = $this->p->cf['lca'];
 				$this->p->cf['opt']['site_defaults'] = apply_filters( $lca.'_get_site_defaults', 
@@ -82,7 +82,7 @@ if ( ! class_exists( 'WpssoOptions' ) ) {
 			if ( $idx !== false ) {
 				if ( isset( $this->p->cf['opt']['site_defaults'][$idx] ) )
 					return $this->p->cf['opt']['site_defaults'][$idx];
-				else return false;
+				else return null;
 			} else return $this->p->cf['opt']['site_defaults'];
 		}
 
@@ -95,19 +95,16 @@ if ( ! class_exists( 'WpssoOptions' ) ) {
 
 				// check for a new plugin and/or extension version
 				foreach ( $this->p->cf['plugin'] as $lca => $info ) {
-
 					if ( empty( $info['version'] ) )
 						continue;
-
 					$key = 'plugin_'.$lca.'_version';
-
 					if ( empty( $opts[$key] ) || 
 						version_compare( $opts[$key], $info['version'], '!=' ) ) {
-
 						WpssoUtil::save_time( $lca, $info['version'], 'update' );
 						$opts[$key] = $info['version'];
 						$has_diff_version = true;
 					}
+					unset( $key );
 				}
 
 				// check for an upgrade to the options array
@@ -132,10 +129,24 @@ if ( ! class_exists( 'WpssoOptions' ) ) {
 
 				// adjust some options based on external factors
 				if ( ! $network ) {
-
 					if ( ! $this->p->check->aop( $this->p->cf['lca'], 
-						true, $this->p->is_avail['aop'] ) )
-							$opts['plugin_filter_content'] = 0;
+						false, $this->p->is_avail['aop'] ) ) {
+						foreach ( array(
+							'plugin_filter_content',
+							'plugin_check_head',
+							'plugin_upscale_images',
+							'plugin_object_cache_exp',
+						) as $idx ) {
+							$def_val = $this->get_defaults( $idx );
+							// numeric options from forms are strings, so don't do a strict test
+							if ( $opts[$idx] != $def_val ) {
+								if ( is_admin() )
+									$this->p->notice->err( sprintf( __( 'Non-standard value found for the Free version \'%s\' option - resetting the option to its default value.', 'wpsso' ), $idx ), true );
+								$opts[$idx] = $def_val;
+								$has_diff_options = true;	// save the options
+							}
+						}
+					}
 
 					// if an seo plugin is found, disable the canonical and description meta tags
 					if ( $this->p->is_avail['seo']['*'] ) {
@@ -145,8 +156,7 @@ if ( ! class_exists( 'WpssoOptions' ) ) {
 						}
 					} 
 
-					$opts['add_meta_name_generator'] = defined( 'WPSSO_META_GENERATOR_DISABLE' ) && 
-						WPSSO_META_GENERATOR_DISABLE ? 0 : 1;
+					$opts['add_meta_name_generator'] = SucomUtil::get_const( 'WPSSO_META_GENERATOR_DISABLE' ) ? 0 : 1;
 				}
 
 				// save options and issue possibly issue reminders
@@ -202,8 +212,7 @@ if ( ! class_exists( 'WpssoOptions' ) ) {
 						$url = $this->p->util->get_admin_url( 'general' );
 					else $url = $this->p->util->get_admin_url( 'network' );
 
-					$this->p->notice->err( $err_msg.
-						sprintf( __( 'The plugin settings have been returned to their default values &mdash; <a href="%s">please review and save the new settings</a>.', 'wpsso' ), $url ) );
+					$this->p->notice->err( $err_msg.' '.sprintf( __( 'The plugin settings have been returned to their default values &mdash; <a href="%s">please review and save the new settings</a>.', 'wpsso' ), $url ) );
 				}
 			}
 
@@ -291,6 +300,20 @@ if ( ! class_exists( 'WpssoOptions' ) ) {
 				( ! is_numeric( $opts['fb_app_id'] ) || strlen( $opts['fb_app_id'] ) > 32 ) )
 					$this->p->notice->err( sprintf( __( 'The Facebook App ID must be numeric and 32 characters or less in length &mdash; the value of "%s" is not valid.', 'wpsso' ), $opts['fb_app_id'] ), true );
 
+			// get / remove dimensions for remote image urls
+			foreach ( array(
+				'rp_img_url',
+				'og_img_url',
+				'og_def_img_url',
+				'schema_logo_url',
+			) as $key ) {
+				if ( ! empty( $opts[$key] ) &&
+					strpos( $opts[$key], '://' ) !== false )
+						list( $opts[$key.':width'], $opts[$key.':height'],
+							$type, $attr ) = @getimagesize( $opts[$key] );
+				else unset( $opts[$key.':width'], $opts[$key.':height'] );
+			}
+
 			return $opts;
 		}
 
@@ -340,13 +363,14 @@ if ( ! class_exists( 'WpssoOptions' ) ) {
 				return $type;
 
 			switch ( $key ) {
+				// empty string or must include at least one HTML tag
 				case 'og_vid_embed':
 					return 'html';
 					break;
 				// js and css
 				case ( strpos( $key, '_js_' ) === false ? false : true ):
 				case ( strpos( $key, '_css_' ) === false ? false : true ):
-				case ( preg_match( '/^[a-z]+_html$/', $key ) ? true : false ):
+				case ( preg_match( '/_html$/', $key ) ? true : false ):
 					return 'code';
 					break;
 				// twitter-style usernames (prepend with an at)
@@ -358,55 +382,65 @@ if ( ! class_exists( 'WpssoOptions' ) ) {
 					return 'url_base';
 					break;
 				// must be a url
-				case 'seo_publisher_url':
+				case 'sharing_url':
 				case 'fb_page_url':
 				case 'fb_publisher_url':
+				case 'seo_publisher_url':
 				case 'schema_logo_url':
 				case 'og_def_img_url':
 				case 'og_img_url':
+				case 'og_vid_url':
+				case 'rp_img_url':
 					return 'url';
 					break;
-				// must be numeric (blank or zero is ok)
-				case 'fb_app_id':
-				case 'og_img_id':
-				case 'og_def_img_id':
-				case 'og_def_author_id':
+				// must be numeric (blank and zero are ok)
 				case 'seo_def_author_id':
-					return 'blank_num';
+				case 'og_def_author_id':
+				case 'og_def_img_id':
+				case 'og_img_id':
+				case 'rp_img_id':
+					return 'blank_num';	// cast as integer
 					break;
+				// must be numeric (zero and -1 is ok)
 				case 'og_img_max':
 				case 'og_vid_max':
 				case 'og_desc_hashtags': 
 				case 'plugin_file_cache_exp':
 				case ( strpos( $key, '_filter_prio' ) === false ? false : true ):
-					return 'numeric';
+					return 'numeric';	// cast as integer
 					break;
-				// integer options that must be 1 or more (not zero)
+				// integer options that must be positive (1 or more)
+				case 'plugin_upscale_img_max':
 				case 'plugin_object_cache_exp':
 				case 'plugin_min_shorten':
 				case ( preg_match( '/_len$/', $key ) ? true : false ):
-					return 'pos_num';
+					return 'pos_num';	// cast as integer
 					break;
 				// image dimensions, subject to minimum value (typically, at least 200px)
 				case ( preg_match( '/_img_(width|height)$/', $key ) ? true : false ):
 				case ( preg_match( '/^tc_[a-z]+_(width|height)$/', $key ) ? true : false ):
-					return 'img_dim';
+					return 'img_dim';	// cast as integer
 					break;
 				// must be texturized 
 				case 'og_title_sep':
 					return 'textured';
 					break;
-				// must be alpha-numeric (upper or lower case)
+				// empty of alpha-numeric uppercase (hyphens are allowed as well)
+				case ( preg_match( '/_tid$/', $key ) ? true : false ):
+					return 'auth_id';
+					break;
+				// empty or alpha-numeric (upper or lower case), plus underscores
+				case 'fb_app_id':
 				case 'fb_app_secret':
 				case 'rp_dom_verify':
 				case ( preg_match( '/_api_key$/', $key ) ? true : false ):
 					return 'api_key';
 					break;
-				// must be alpha-numeric uppercase (hyphens allowed as well)
-				case ( preg_match( '/_tid$/', $key ) ? true : false ):
-					return 'auth_id';
+				// text strings that can be blank (multi-line is ok)
+				case 'plugin_cf_vid_embed':
+					return 'ok_blank';
 					break;
-				// text strings that can be blank
+				// text strings that can be blank (line breaks are removed)
 				case 'og_art_section':
 				case 'og_title':
 				case 'og_desc':
@@ -415,22 +449,25 @@ if ( ! class_exists( 'WpssoOptions' ) ) {
 				case 'schema_desc':
 				case 'seo_desc':
 				case 'tc_desc':
+				case 'pin_desc':
 				case 'plugin_img_alt_prefix':
 				case 'plugin_p_cap_prefix':
 				case 'plugin_cf_vid_url':
-				case 'plugin_cf_vid_embed':
 				case 'plugin_bitly_login':
 				case ( strpos( $key, '_filter_name' ) === false ? false : true ):
-					return 'ok_blank';
+					return 'one_line';
 					break;
 				// options that cannot be blank
+				case 'fb_lang': 
+				case 'og_author_field':
 				case 'seo_author_field':
 				case 'og_def_img_id_pre': 
 				case 'og_img_id_pre': 
-				case 'og_author_field':
+				case 'rp_img_id_pre': 
 				case 'rp_author_name':
-				case 'fb_lang': 
 				case 'plugin_shortener':	// none or name of shortener
+				case ( strpos( $key, '_crop_x' ) === false ? false : true ):
+				case ( strpos( $key, '_crop_y' ) === false ? false : true ):
 				case ( preg_match( '/_tid:use$/', $key ) ? true : false ):
 				case ( preg_match( '/^(plugin|wp)_cm_[a-z]+_(name|label)$/', $key ) ? true : false ):
 					return 'not_blank';

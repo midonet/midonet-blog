@@ -2,7 +2,7 @@
 /*
  * License: GPLv3
  * License URI: http://www.gnu.org/licenses/gpl.txt
- * Copyright 2012-2015 - Jean-Sebastien Morisset - http://surniaulula.com/
+ * Copyright 2012-2016 Jean-Sebastien Morisset (http://surniaulula.com/)
  */
 
 if ( ! defined( 'ABSPATH' ) ) 
@@ -37,7 +37,7 @@ if ( ! class_exists( 'SucomUtil' ) ) {
 		public static function get_const( $const ) {
 			if ( defined( $const ) )
 				return constant( $const );
-			else return false;
+			else return null;
 		}
 
 		// returns false or the admin screen id text string
@@ -51,12 +51,12 @@ if ( ! class_exists( 'SucomUtil' ) ) {
 		}
 
 		public static function sanitize_hookname( $name ) {
-			$name = str_replace( array( '/', '-' ), '_', $name );
+			$name = preg_replace( '/[:\/\-\.]+/', '_', $name );
 			return self::sanitize_key( $name );
 		}
 
 		public static function sanitize_classname( $name ) {
-			$name = str_replace( array( '/', '-' ), '', $name );
+			$name = preg_replace( '/[:\/\-\.]+/', '', $name );
 			return self::sanitize_key( $name );
 		}
 
@@ -66,10 +66,19 @@ if ( ! class_exists( 'SucomUtil' ) ) {
 			return $tag;
 		}
 
+		public static function sanitize_hashtags( $tags = array() ) {
+			// truncate tags that start with a number (not allowed)
+			return preg_replace( array( '/^[0-9].*/', '/[ \[\]#!\$\?\\\\\/\*\+\.\-\^]/', '/^.+/' ), 
+				array( '', '', '#$0' ), $tags );
+		}
+
+		public static function array_to_hashtags( $tags = array() ) {
+			// array_filter() removes empty array values
+			return trim( implode( ' ', array_filter( self::sanitize_hashtags( $tags ) ) ) );
+		}
+
 		public static function sanitize_key( $key ) {
-			$key = strtolower( $key );
-			$key = preg_replace( '/[^a-z0-9_\-]/', '', $key );
-			return $key;
+			return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( $key ) );
 		}
 
 		public function get_inline_vars() {
@@ -181,7 +190,7 @@ if ( ! class_exists( 'SucomUtil' ) ) {
 			else $opts = get_option( $name, array() );
 			if ( isset( $opts[$key] ) )
 				return $opts[$key];
-			else return false;
+			else return null;
 		}
 
 		public static function a2aa( $a ) {
@@ -361,10 +370,9 @@ if ( ! class_exists( 'SucomUtil' ) ) {
 				$ret = true;
 			elseif ( is_admin() ) {
 				$screen_id = self::get_screen_id();
-
 				// exclude post/page/media editing lists
-				if ( strpos( $screen_id, 'edit-' ) !== false || 
-					$screen_id === 'upload' )
+				if ( $screen_id === 'upload' ||
+					strpos( $screen_id, 'edit-' ) === 0 )
 						$ret = false;
 				elseif ( self::get_req_val( 'post_ID', 'POST' ) !== '' ||
 					self::get_req_val( 'post', 'GET' ) !== '' )
@@ -477,13 +485,23 @@ if ( ! class_exists( 'SucomUtil' ) ) {
 			if ( is_author() ) {
 				$ret = true;
 			} elseif ( is_admin() ) {
-				if ( ( $screen_id = self::get_screen_id() ) !== false &&
-					( $screen_id === 'user-edit' || $screen_id === 'profile' ) )
+				$screen_id = self::get_screen_id();
+				if ( $screen_id !== false ) {
+					switch ( $screen_id ) {
+						case 'profile':
+						case 'user-edit':
+						case ( strpos( $screen_id, 'profile_page_' ) === 0 ? true : false ):
+						case ( strpos( $screen_id, 'users_page_' ) === 0 ? true : false ):
+							$ret = true;
+							break;
+					}
+				}
+				if ( $ret === false ) {
+					if ( self::get_req_val( 'user_id' ) !== '' )
 						$ret = true;
-				elseif ( self::get_req_val( 'user_id' ) !== '' )
-					$ret = true;
-				elseif ( basename( $_SERVER['PHP_SELF'] ) === 'profile.php' )
-					$ret = true;
+					elseif ( basename( $_SERVER['PHP_SELF'] ) === 'profile.php' )
+						$ret = true;
+				}
 			}
 			$ret = apply_filters( 'sucom_is_author_page', $ret );
 			if ( $cache )
@@ -676,8 +694,8 @@ if ( ! class_exists( 'SucomUtil' ) ) {
 
 			// fallback for themes and plugins that don't use the standard wordpress functions/variables
 			if ( empty ( $url ) ) {
-				$url = empty( $_SERVER['HTTPS'] ) ? 'http://' : 'https://';
-				$url .= $_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
+				$url = ( empty( $_SERVER['HTTPS'] ) ? 'http://' : 'https://' ).
+					$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
 				// strip out tracking query arguments by facebook, google, etc.
 				$url = preg_replace( '/([\?&])(fb_action_ids|fb_action_types|fb_source|fb_aggregation_id|utm_source|utm_medium|utm_campaign|utm_term|gclid|pk_campaign|pk_kwd)=[^&]*&?/i', '$1', $url );
 			}
@@ -727,14 +745,15 @@ if ( ! class_exists( 'SucomUtil' ) ) {
 			if ( ! function_exists( 'mb_decode_numericentity' ) )
 				return $encoded;
 
-			$decoded = preg_replace( '/&#\d{2,5};/ue', 'self::decode_utf8_entity( \'$0\' )', $encoded );
+			$decoded = preg_replace_callback( '/&#\d{2,5};/u',
+				array( __CLASS__, 'decode_utf8_entity' ), $encoded );
 
 			return $decoded;
 		}
 
-		public static function decode_utf8_entity( $entity ) {
+		public static function decode_utf8_entity( $matches ) {
 			$convmap = array( 0x0, 0x10000, 0, 0xfffff );
-			return mb_decode_numericentity( $entity, $convmap, 'UTF-8' );
+			return mb_decode_numericentity( $matches[0], $convmap, 'UTF-8' );
 		}
 
 		// limit_text_length() uses PHP's multibyte functions (mb_strlen and mb_substr)
@@ -753,7 +772,7 @@ if ( ! class_exists( 'SucomUtil' ) ) {
 				} else $trailing = '';							// truncate trailing string if text is less than maxlen
 				$text = $text.$trailing;						// trim and add trailing string (if provided)
 			}
-			$text = htmlentities( $text, ENT_QUOTES, $charset, false );			// double_encode = false
+			//$text = htmlentities( $text, ENT_QUOTES, $charset, false );
 			$text = preg_replace( '/&nbsp;/', ' ', $text);					// just in case
 			return $text;
 		}
@@ -763,7 +782,7 @@ if ( ! class_exists( 'SucomUtil' ) ) {
 			$alt_prefix = isset( $this->p->options['plugin_img_alt_prefix'] ) ?
 				$this->p->options['plugin_img_alt_prefix'] : 'Image:';
 			$text = strip_shortcodes( $text );						// remove any remaining shortcodes
-			$text = html_entity_decode( $text, ENT_QUOTES, get_bloginfo( 'charset' ) );
+			//$text = html_entity_decode( $text, ENT_QUOTES, get_bloginfo( 'charset' ) );	// leave it encoded
 			$text = preg_replace( '/[\s\n\r]+/s', ' ', $text );				// put everything on one line
 			$text = preg_replace( '/<\?.*\?>/i', ' ', $text);				// remove php
 			$text = preg_replace( '/<script\b[^>]*>(.*?)<\/script>/i', ' ', $text);		// remove javascript
@@ -898,44 +917,59 @@ if ( ! class_exists( 'SucomUtil' ) ) {
 			return $plugin_info;
 		}
 
-		public function get_admin_url( $submenu = '', $link_text = '', $lca = '' ) {
-			$query = '';
+		public function get_admin_url( $menu_id = '', $link_text = '', $menu_lib = '' ) {
 			$hash = '';
-			$url = '';
-			$lca = empty( $lca ) ? $this->p->cf['lca'] : $lca;
+			$query = '';
+			$admin_url = '';
+			$lca = $this->p->cf['lca'];
 
-			if ( strpos( $submenu, '#' ) !== false )
-				list( $submenu, $hash ) = explode( '#', $submenu );
-			if ( strpos( $submenu, '?' ) !== false )
-				list( $submenu, $query ) = explode( '?', $submenu );
+			// $menu_id may start with a hash or query, so parse before checking its value
+			if ( strpos( $menu_id, '#' ) !== false )
+				list( $menu_id, $hash ) = explode( '#', $menu_id );
 
-			if ( $submenu == '' ) {
+			if ( strpos( $menu_id, '?' ) !== false )
+				list( $menu_id, $query ) = explode( '?', $menu_id );
+
+			if ( empty( $menu_id ) ) {
 				$current = $_SERVER['REQUEST_URI'];
 				if ( preg_match( '/^.*\?page='.$lca.'-([^&]*).*$/', $current, $match ) )
-					$submenu = $match[1];
-				else $submenu = key( $this->p->cf['*']['lib']['submenu'] );
+					$menu_id = $match[1];
+				else $menu_id = key( $this->p->cf['*']['lib']['submenu'] );	// default to first submenu
 			}
 
-			if ( array_key_exists( $submenu, $this->p->cf['*']['lib']['setting'] ) ) {
-				$page = 'options-general.php?page='.$lca.'-'.$submenu;
-				$url = admin_url( $page );
-			} elseif ( array_key_exists( $submenu, $this->p->cf['*']['lib']['submenu'] ) ) {
-				$page = 'admin.php?page='.$lca.'-'.$submenu;
-				$url = admin_url( $page );
-			} elseif ( array_key_exists( $submenu, $this->p->cf['*']['lib']['sitesubmenu'] ) ) {
-				$page = 'admin.php?page='.$lca.'-'.$submenu;
-				$url = network_admin_url( $page );
+			// find the menu_lib value for this menu_id
+			if ( empty( $menu_lib ) ) {
+				foreach ( $this->p->cf['*']['lib'] as $menu_lib => $menu ) {
+					if ( isset( $menu[$menu_id] ) )
+						break;
+					else $menu_lib = '';
+				}
+			}
+
+			if ( empty( $menu_lib ) ||
+				empty( $this->p->cf['wp']['admin'][$menu_lib]['page'] ) )
+					return;
+
+			$parent_slug = $this->p->cf['wp']['admin'][$menu_lib]['page'].'?page='.$lca.'-'.$menu_id;
+
+			switch ( $menu_lib ) {
+				case 'sitesubmenu':
+					$admin_url = network_admin_url( $parent_slug );
+					break;
+				default:
+					$admin_url = admin_url( $parent_slug );
+					break;
 			}
 
 			if ( ! empty( $query ) ) 
-				$url .= '&'.$query;
+				$admin_url .= '&'.$query;
 
 			if ( ! empty( $hash ) ) 
-				$url .= '#'.$hash;
+				$admin_url .= '#'.$hash;
 
 			if ( empty( $link_text ) ) 
-				return $url;
-			else return '<a href="'.$url.'">'.$link_text.'</a>';
+				return $admin_url;
+			else return '<a href="'.$admin_url.'">'.$link_text.'</a>';
 		}
 
 		public function delete_expired_db_transients( $all = false ) { 
@@ -978,24 +1012,23 @@ if ( ! class_exists( 'SucomUtil' ) ) {
 			return $deleted;
 		}
 
-		// if id 0 then returns values from the plugin settings 
-		public function get_max_nums( $id, $mod = false ) {
-			$og_max = array();
+		// if id is 0 or false, return values from the plugin settings 
+		public function get_max_nums( $id = false, $mod = false ) {
+			$max = array();
 			foreach ( array( 'og_vid_max', 'og_img_max' ) as $max_name ) {
-				$num_meta = false;
 				if ( ! empty( $id ) && 
 					isset( $this->p->mods['util'][$mod] ) )
 						$num_meta = $this->p->mods['util'][$mod]->get_options( $id, $max_name );
+				else $num_meta = null;	// default value returned by get_options() if index key is missing
+
 				// quick sanitation of returned value
-				if ( $num_meta === false || $num_meta === '' || $num_meta < 0 ) {
-					$og_max[$max_name] = $this->p->options[$max_name];
-				} else {
-					$og_max[$max_name] = $num_meta;
+				if ( is_numeric( $num_meta ) && $num_meta >= 0 ) {
+					$max[$max_name] = $num_meta;
 					if ( $this->p->debug->enabled )
 						$this->p->debug->log( 'found custom meta '.$max_name.' = '.$num_meta );
-				}
+				} else $max[$max_name] = $this->p->options[$max_name];	// fallback to options
 			}
-			return $og_max;
+			return $max;
 		}
 
 		public function push_max( &$dst, &$src, $num = 0 ) {
@@ -1080,12 +1113,16 @@ if ( ! class_exists( 'SucomUtil' ) ) {
 				$class_link .= ' '.$class_link.$metabox;
 			}
 
-			extract( array_merge( array( 'scroll_to' => '' ), $args ) );
+			// allow a css ID to be passed as a query argument
+			extract( array_merge( array(
+				'scroll_to' => isset( $_GET['scroll_to'] ) ? 
+					'#'.SucomUtil::sanitize_key( $_GET['scroll_to'] ) : '',
+			), $args ) );
 
-			echo '<script type="text/javascript">jQuery(document).ready(function(){ 
-				sucomTabs(\''.$metabox.'\', \''.$default_tab.'\', \''.$scroll_to.'\'); });</script>
-			<div class="'.$class_metabox_tabs.'">
-			<ul class="'.$class_metabox_tabs.'">'."\n";
+			echo "\n".'<script type="text/javascript">jQuery(document).ready(function(){ '.
+				'sucomTabs(\''.$metabox.'\', \''.$default_tab.'\', \''.$scroll_to.'\'); });</script>'."\n";
+			echo '<div class="'.$class_metabox_tabs.'">'."\n";
+			echo '<ul class="'.$class_metabox_tabs.'">'."\n";
 			foreach ( $tabs as $tab => $title ) {
 				$class_href_key = $class_tabset.$metabox.'-tab_'.$tab;
 				echo '<div class="tab_left">&nbsp;</div><li class="'.
@@ -1119,7 +1156,7 @@ if ( ! class_exists( 'SucomUtil' ) ) {
 			$hidden_rows = 0;
 
 			// use call_user_func() instead of $classname::show_opts() for PHP 5.2
-			$show_opts = class_exists( $lca.'user' ) ? call_user_func( array(  $lca.'user', 'show_opts' ) ) : 'basic';
+			$show_opts = class_exists( $lca.'user' ) ? call_user_func( array( $lca.'user', 'show_opts' ) ) : 'basic';
 
 			foreach ( $table_rows as $key => $row ) {
 				// default row class and id attribute values
@@ -1143,7 +1180,7 @@ if ( ! class_exists( 'SucomUtil' ) ) {
 						// count the number of rows and options that are hidden
 						if ( $att === 'class' && ! empty( $show_opts ) && 
 							( $matched = preg_match( '/<tr [^>]*class="[^"]*hide_in_'.$show_opts.'[" ]/', $row ) > 0 ) ) {
-							$hidden_opts += preg_match_all( '/<th/', $row, $matches );
+							$hidden_opts += preg_match_all( '/(<th|<tr[^>]*><td)/', $row, $matches );
 							$hidden_rows += $matched;
 						}
 
@@ -1423,7 +1460,7 @@ if ( ! class_exists( 'SucomUtil' ) ) {
 				if ( defined( 'T_DOC_COMMENT' ) )
 					$comments[] = T_DOC_COMMENT;	// php 5
 				if ( defined( 'T_ML_COMMENT' ) )
-				        $comments[] = T_ML_COMMENT;	// php 4
+					$comments[] = T_ML_COMMENT;	// php 4
 				$tokens = token_get_all( $php );
 				foreach ( $tokens as $token ) {
 					if ( is_array( $token ) ) {
@@ -1435,6 +1472,45 @@ if ( ! class_exists( 'SucomUtil' ) ) {
 				}
 			} else $ret = false;
 			return $ret;
+		}
+
+		public static function esc_url_encode( $url ) {
+			$allowed = array( '!', '*', '\'', '(', ')', ';', ':', '@', '&', '=',
+				'+', '$', ',', '/', '?', '%', '#', '[', ']' );
+			$replace = array( '%21', '%2A', '%27', '%28', '%29', '%3B', '%3A', '%40', '%26', '%3D',
+				'%2B', '%24', '%2C', '%2F', '%3F', '%25', '%23', '%5B', '%5D' );
+			return str_replace( $replace, $allowed, urlencode( esc_url( $url ) ) );
+		}
+
+		// wp_encode_emoji() is only available since v4.2
+		// use the wp function if available, otherwise provide the same functionality
+		public static function encode_emoji( $content ) {
+			if ( function_exists( 'wp_encode_emoji' ) )
+				return wp_encode_emoji( $content );		// since wp 4.2 
+			elseif ( function_exists( 'mb_convert_encoding' ) ) {
+				$regex = '/(
+				     \x23\xE2\x83\xA3               # Digits
+				     [\x30-\x39]\xE2\x83\xA3
+				   | \xF0\x9F[\x85-\x88][\xA6-\xBF] # Enclosed characters
+				   | \xF0\x9F[\x8C-\x97][\x80-\xBF] # Misc
+				   | \xF0\x9F\x98[\x80-\xBF]        # Smilies
+				   | \xF0\x9F\x99[\x80-\x8F]
+				   | \xF0\x9F\x9A[\x80-\xBF]        # Transport and map symbols
+				)/x';
+				$matches = array();
+				if ( preg_match_all( $regex, $content, $matches ) ) {
+					if ( ! empty( $matches[1] ) ) {
+						foreach ( $matches[1] as $emoji ) {
+							$unpacked = unpack( 'H*', mb_convert_encoding( $emoji, 'UTF-32', 'UTF-8' ) );
+							if ( isset( $unpacked[1] ) ) {
+								$entity = '&#x' . ltrim( $unpacked[1], '0' ) . ';';
+								$content = str_replace( $emoji, $entity, $content );
+							}
+						}
+					}
+				}
+			}
+			return $content;
 		}
 	}
 }

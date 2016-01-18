@@ -2,7 +2,7 @@
 /*
  * License: GPLv3
  * License URI: http://www.gnu.org/licenses/gpl.txt
- * Copyright 2012-2015 - Jean-Sebastien Morisset - http://surniaulula.com/
+ * Copyright 2012-2016 Jean-Sebastien Morisset (http://surniaulula.com/)
  */
 
 if ( ! defined( 'ABSPATH' ) ) 
@@ -35,8 +35,7 @@ if ( ! class_exists( 'WpssoGplAdminUser' ) ) {
 			'<td class="blank">'.$this->p->webpage->get_description( $this->p->options['og_desc_len'],
 				'...', false, true, true, true, 'none' ).'</td>';	// $use_post = false, $md_idx = 'none'
 	
-			$rows[] = '<tr class="hide_in_basic">'.
-			$this->p->util->get_th( _x( 'Google+ / Schema Description',
+			$rows[] = $this->p->util->get_th( _x( 'Google / Schema Description',
 				'option label', 'wpsso' ), 'medium', 'meta-schema_desc', $head_info ).
 			'<td class="blank">'.$this->p->webpage->get_description( $this->p->options['schema_desc_len'],
 				'...', false ).'</td>';				// $use_post = false
@@ -64,8 +63,9 @@ if ( ! class_exists( 'WpssoGplAdminUser' ) ) {
 			$rows[] = '<td colspan="2" align="center">'.
 				$this->p->msgs->get( 'pro-feature-msg' ).'</td>';
 
-			$rows[] = '<td colspan="2" class="subsection"><h4 style="margin-top:0;">'.
-				_x( 'All Social Websites / Open Graph', 'metabox title', 'wpsso' ).'</h4></td>';
+			$rows[] = '<td></td><td class="subsection top"><h4>'.
+				_x( 'All Social Websites / Open Graph',
+					'metabox title', 'wpsso' ).'</h4></td>';
 
 			$rows[] = '<tr class="hide_in_basic">'.
 			$this->p->util->get_th( _x( 'Image Dimensions',
@@ -105,8 +105,9 @@ if ( ! class_exists( 'WpssoGplAdminUser' ) ) {
 			if ( ! SucomUtil::get_const( 'WPSSO_RICH_PIN_DISABLE' ) ) {
 
 				$rows[] = '<tr class="hide_in_basic">'.
-				'<td colspan="2" class="subsection"><h4>'.
-					_x( 'Pinterest (Rich Pin)', 'metabox title', 'wpsso' ).'</h4></td>';
+				'<td></td><td class="subsection"><h4>'.
+					_x( 'Pinterest / Rich Pin',
+						'metabox title', 'wpsso' ).'</h4></td>';
 	
 				$rows[] = '<tr class="hide_in_basic">'.
 				$this->p->util->get_th( _x( 'Image Dimensions',

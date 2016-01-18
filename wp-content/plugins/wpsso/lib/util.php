@@ -2,7 +2,7 @@
 /*
  * License: GPLv3
  * License URI: http://www.gnu.org/licenses/gpl.txt
- * Copyright 2012-2015 - Jean-Sebastien Morisset - http://surniaulula.com/
+ * Copyright 2012-2016 Jean-Sebastien Morisset (http://surniaulula.com/)
  */
 
 if ( ! defined( 'ABSPATH' ) ) 
@@ -26,7 +26,7 @@ if ( ! class_exists( 'WpssoUtil' ) && class_exists( 'SucomUtil' ) ) {
 
 		protected function add_actions() {
 			add_action( 'wp', array( &$this, 'add_plugin_image_sizes' ), -100 );	// runs everytime a posts query is triggered from an url
-			add_action( 'admin_init', array( &$this, 'add_plugin_image_sizes' ), -100 );
+			add_action( 'current_screen', array( &$this, 'add_plugin_image_sizes' ), -100 );
 			add_action( 'wp_scheduled_delete', array( &$this, 'delete_expired_db_transients' ) );
 			add_action( 'wp_scheduled_delete', array( &$this, 'delete_expired_file_cache' ) );
 		}
@@ -75,7 +75,7 @@ if ( ! class_exists( 'WpssoUtil' ) && class_exists( 'SucomUtil' ) ) {
 			else return $size_name;
 		}
 
-		// called directly (with or without an id) and from the 'wp' action ($id will be an object)
+		// called directly (with or without an id) and from the 'wp' + 'current_screen' actions ($id will be an object)
 		public function add_plugin_image_sizes( $id = false, $sizes = array(), $filter = true, $mod = false ) {
 			/*
 			 * Allow various plugin extensions to provide their image names, labels, etc.
@@ -93,49 +93,67 @@ if ( ! class_exists( 'WpssoUtil' ) && class_exists( 'SucomUtil' ) ) {
 			 *		)
 			 *	)
 			 */
+			if ( $this->p->debug->enabled )
+				$this->p->debug->mark( 'define image sizes' );	// begin timer
+
 			if ( $filter === true )
 				$sizes = apply_filters( $this->p->cf['lca'].'_plugin_image_sizes', $sizes, $id, $mod );
+
 			$meta_opts = array();
 
-			if ( $mod === false ) {
+			// check for object passed by some action hooks
+			if ( is_object( $id ) ) {
+				switch ( get_class( $id ) ) {
+					case 'WP':
+					case 'WP_Screen':
+						$id = false;
+						break;
+					case 'WP_Post':
+						$mod = 'post';
+						$id = $id->ID;
+						break;
+					case 'WP_Term':
+						$mod = 'taxonomy';
+						$id = $id->term_id;
+						break;
+					case 'WP_User':
+						$mod = 'user';
+						$id = $id->ID;
+						break;
+					default:
+						$id = false;
+						break;
+				}
+			}
+
+			if ( empty( $mod ) ) {
 				if ( SucomUtil::is_post_page( false ) )
 					$mod = 'post';
 				elseif ( SucomUtil::is_term_page() )
 					$mod = 'taxonomy';
 				elseif ( SucomUtil::is_author_page() )
 					$mod = 'user';
-				elseif ( $this->p->debug->enabled )
-					$this->p->debug->log( 'module type could not be determined' );
 			}
 
-			if ( is_object( $id ) ) {
-				$obj = $id;	// could be WP_Object or post/term/user object
-				$id = false;
-				if ( $mod === 'post' )
-					$id = empty( $obj->ID ) || empty( $obj->post_type ) ? 
-						$this->get_post_object( false, 'id' ) : $obj->ID;
-				elseif ( $mod === 'taxonomy' )
-					$id = empty( $obj->term_id ) ?
-						$this->get_term_object( 'id' ) : $obj->term_id;
-				elseif ( $mod === 'user' )
-					$id = empty( $obj->ID ) ?
-						$this->get_author_object( 'id' ): $obj->ID;
-			} elseif ( empty( $id ) ) {
+			if ( empty( $id ) && ! empty( $mod ) ) {
 				if ( $mod === 'post' )
 					$id = $this->get_post_object( false, 'id' );
 				elseif ( $mod === 'taxonomy' )
 					$id = $this->get_term_object( 'id' );
 				elseif ( $mod === 'user' )
 					$id = $this->get_author_object( 'id' );
-			}
+			};
 
 			if ( empty( $mod ) ) {
 				if ( $this->p->debug->enabled )
-					$this->p->debug->log( 'no module defined' );
+					$this->p->debug->log( 'module is unknown' );
+
 			} elseif ( empty( $id ) ) {
 				if ( $this->p->debug->enabled )
-					$this->p->debug->log( 'no object id defined' );
-			} else $meta_opts = $this->get_mod_options( $mod, $id );			// get all metadata options
+					$this->p->debug->log( 'object id is unknown' );
+
+			// custom filters may use image sizes, so don't filter/cache the meta options
+			} else $meta_opts = $this->get_mod_options( $mod, $id, false, array( 'filter_options' => false ) );
 
 			foreach( $sizes as $opt_prefix => $size_info ) {
 
@@ -194,6 +212,8 @@ if ( ! class_exists( 'WpssoUtil' ) && class_exists( 'SucomUtil' ) ) {
 								$size_info['crop_x'].'/'.$size_info['crop_y'] ).' added' );
 				}
 			}
+			if ( $this->p->debug->enabled )
+				$this->p->debug->mark( 'define image sizes' );	// end timer
 		}
 
 		public function add_ptns_to_opts( &$opts = array(), $prefixes, $default = 1 ) {
@@ -345,7 +365,7 @@ if ( ! class_exists( 'WpssoUtil' ) && class_exists( 'SucomUtil' ) ) {
 			}
 			if ( ( $topics = file( WPSSO_TOPICS_LIST, 
 				FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES ) ) === false ) {
-				$this->p->notice->err( sprintf( 'Error reading the %s topic list file.', WPSSO_TOPICS_LIST ) );
+				$this->p->notice->err( sprintf( __( 'Error reading the %s topic list file.', 'wpsso' ), WPSSO_TOPICS_LIST ) );
 				return $topics;
 			}
 			$topics = apply_filters( $this->p->cf['lca'].'_topics', $topics );
@@ -368,32 +388,35 @@ if ( ! class_exists( 'WpssoUtil' ) && class_exists( 'SucomUtil' ) ) {
 		 *
 		 * Example: get_mod_options( 'post', $post_id, array( 'rp_desc', 'og_desc' ) );
 		 */
-		public function get_mod_options( $mod, $id = false, $idx = false, $attr = array() ) {
+		public function get_mod_options( $mod, $id = false, $idx = false, $atts = array() ) {
 			if ( empty( $id ) || 
 				! isset( $this->p->mods['util'][$mod] ) )
 					return false;
 			// return the whole options array
 			if ( $idx === false ) {
-				$ret = $this->p->mods['util'][$mod]->get_options( $id, $idx, $attr );
+				$ret = $this->p->mods['util'][$mod]->get_options( $id, $idx, $atts );
 			} else {
 				if ( ! is_array( $idx ) )
 					$idx = array( $idx );
-				foreach ( array_unique( $idx ) as $key ) {
+				else $idx = array_unique( $idx );	// just in case
+
+				foreach ( $idx as $key ) {
 					if ( $key === 'none' )		// special keyword
 						return false;		// stop here
 					if ( empty( $key ) )
 						continue;
-					$ret = $this->p->mods['util'][$mod]->get_options( $id, $key, $attr );
+					$ret = $this->p->mods['util'][$mod]->get_options( $id, $key, $atts );
 					if ( ! empty( $ret ) )
 						break;
 				}
 			}
 			if ( ! empty( $ret ) ) {
-				if ( $this->p->debug->enabled )
+				if ( $this->p->debug->enabled ) {
 					$this->p->debug->log( 'custom '.$mod.' '.
 						( $idx === false ? 'options' : ( is_array( $idx ) ? 
 							implode( ', ', $idx ) : $idx ) ).' = '.
 						( is_array( $ret ) ? print_r( $ret, true ) : '"'.$ret.'"' ) );
+				}
 				return $ret;	// stop here
 			}
 			return false;
@@ -417,7 +440,8 @@ if ( ! class_exists( 'WpssoUtil' ) && class_exists( 'SucomUtil' ) ) {
 				default:
 					$val = stripslashes( $val );
 					$val = wp_filter_nohtml_kses( $val );
-					$val = htmlentities( $val, ENT_QUOTES, get_bloginfo( 'charset' ), false );	// double_encode = false
+					$val = SucomUtil::encode_emoji( htmlentities( $val, 
+						ENT_QUOTES, get_bloginfo( 'charset' ), false ) );	// double_encode = false
 					break;
 			}
 
@@ -427,16 +451,18 @@ if ( ! class_exists( 'WpssoUtil' ) && class_exists( 'SucomUtil' ) ) {
 					if ( $val !== '' )
 						$val = trim( wptexturize( ' '.$val.' ' ) );
 					break;
+
 				// must be empty or a url
 				case 'url':
 					if ( $val !== '' ) {
 						$val = $this->cleanup_html_tags( $val );
 						if ( strpos( $val, '//' ) === false ) {
-							$this->p->notice->err( sprintf( 'The value of option \'%s\' must be a URL - resetting the option to its default value.', $key ), true );
+							$this->p->notice->err( sprintf( __( 'The value of option \'%s\' must be a URL - resetting the option to its default value.', 'wpsso' ), $key ), true );
 							$val = $def_val;
 						}
 					}
 					break;
+
 				// strip leading urls off facebook usernames
 				case 'url_base':
 					if ( $val !== '' ) {
@@ -444,6 +470,7 @@ if ( ! class_exists( 'WpssoUtil' ) && class_exists( 'SucomUtil' ) ) {
 						$val = preg_replace( '/(http|https):\/\/[^\/]*?\//', '', $val );
 					}
 					break;
+
 				// twitter-style usernames (prepend with an @ character)
 				case 'at_name':
 					if ( $val !== '' ) {
@@ -452,6 +479,7 @@ if ( ! class_exists( 'WpssoUtil' ) && class_exists( 'SucomUtil' ) ) {
 							$val = '@'.$val;
 					}
 					break;
+
 				case 'pos_num':		// integer options that must be 1 or more (not zero)
 				case 'img_dim':		// image dimensions, subject to minimum value (typically, at least 200px)
 					if ( $option_type == 'img_dim' )
@@ -463,62 +491,81 @@ if ( ! class_exists( 'WpssoUtil' ) && class_exists( 'SucomUtil' ) ) {
 					if ( $val === '' && $mod !== false )
 						break;
 					elseif ( ! is_numeric( $val ) || $val < $min_int ) {
-						$this->p->notice->err( sprintf( 'The value of option \'%s\' must be greater or equal to %s - resetting the option to its default value.', $key, $min_int ), true );
+						$this->p->notice->err( sprintf( __( 'The value of option \'%s\' must be equal to or greather than %s - resetting the option to its default value.', 'wpsso' ), $key, $min_int ), true );
 						$val = $def_val;
-					}
+					} else $val = (int) $val;		// cast as integer
+
 					break;
+
 				// must be blank or numeric
 				case 'blank_num':
-					if ( $val !== '' && ! is_numeric( $val ) ) {
-						$this->p->notice->err( sprintf( 'The value of option \'%s\' must be numeric - resetting the option to its default value.', $key ), true );
-						$val = $def_val;
+					if ( $val !== '' ) {
+						if ( ! is_numeric( $val ) ) {
+							$this->p->notice->err( sprintf( __( 'The value of option \'%s\' must be numeric - resetting the option to its default value.', 'wpsso' ), $key ), true );
+							$val = $def_val;
+						} else $val = (int) $val;	// cast as integer
 					}
 					break;
+
 				// must be numeric
 				case 'numeric':
 					if ( ! is_numeric( $val ) ) {
-						$this->p->notice->err( sprintf( 'The value of option \'%s\' must be numeric - resetting the option to its default value.', $key ), true );
+						$this->p->notice->err( sprintf( __( 'The value of option \'%s\' must be numeric - resetting the option to its default value.', 'wpsso' ), $key ), true );
 						$val = $def_val;
-					}
+					} else $val = (int) $val;		// cast as integer
 					break;
-				// must be alpha-numeric uppercase (hyphens are allowed as well)
+
+				// empty of alpha-numeric uppercase (hyphens are allowed as well)
 				case 'auth_id':
 					$val = trim( $val );
 					if ( $val !== '' && preg_match( '/[^A-Z0-9\-]/', $val ) ) {
-						$this->p->notice->err( sprintf( '\'%s\' is not an acceptable value for option \'%s\' - resetting the option to its default value.', $val, $key ), true );
+						$this->p->notice->err( sprintf( __( '\'%1$s\' is not an acceptable value for option \'%2$s\' - resetting the option to its default value.', 'wpsso' ), $val, $key ), true );
 						$val = $def_val;
-					}
+					} else $val = (string) $val;		// cast as string
 					break;
-				// blank or alpha-numeric (upper or lower case), plus underscores
+
+				// empty or alpha-numeric (upper or lower case), plus underscores
 				case 'api_key':
 					$val = trim( $val );
 					if ( $val !== '' && preg_match( '/[^a-zA-Z0-9_]/', $val ) ) {
-						$this->p->notice->err( sprintf( 'The value of option \'%s\' must be alpha-numeric - resetting the option to its default value.', $key ), true );
+						$this->p->notice->err( sprintf( __( 'The value of option \'%s\' must be alpha-numeric - resetting the option to its default value.', 'wpsso' ), $key ), true );
 						$val = $def_val;
-					}
+					} else $val = (string) $val;		// cast as string
 					break;
+
 				// text strings that can be blank
 				case 'ok_blank':
 					if ( $val !== '' )
 						$val = trim( $val );
 					break;
+
+				// text strings that can be blank (line breaks are removed)
+				case 'desc':
+				case 'one_line':
+					if ( $val !== '' )
+						$val = trim( preg_replace( '/[\s\n\r]+/s', ' ', $val ) );
+					break;
+
+				// empty string or must include at least one HTML tag
 				case 'html':
 					if ( $val !== '' ) {
 						$val = trim( $val );
 						if ( ! preg_match( '/<.*>/', $val ) ) {
-							$this->p->notice->err( sprintf( 'The value of option \'%s\' must be HTML code - resetting the option to its default value.', $key ), true );
+							$this->p->notice->err( sprintf( __( 'The value of option \'%s\' must be HTML code - resetting the option to its default value.', 'wpsso' ), $key ), true );
 							$val = $def_val;
 						}
 					}
 					break;
+
 				// options that cannot be blank
 				case 'code':
 				case 'not_blank':
 					if ( $val === '' ) {
-						$this->p->notice->err( sprintf( 'The value of option \'%s\' cannot be empty - resetting the option to its default value.', $key ), true );
+						$this->p->notice->err( sprintf( __( 'The value of option \'%s\' cannot be empty - resetting the option to its default value.', 'wpsso' ), $key ), true );
 						$val = $def_val;
 					}
 					break;
+
 				// everything else is a 1 or 0 checkbox option 
 				case 'checkbox':
 				default:
@@ -551,16 +598,16 @@ if ( ! class_exists( 'WpssoUtil' ) && class_exists( 'SucomUtil' ) ) {
 				$xpath = new DOMXPath( $doc );
 				$metas = $xpath->query( $query );
 				foreach ( $metas as $m ) {
-					$attrs = array();		// put all attributes in a single array
+					$m_atts = array();		// put all attributes in a single array
 					foreach ( $m->attributes as $a )
-						$attrs[$a->name] = $a->value;
-					$ret[$m->tagName][] = $attrs;
+						$m_atts[$a->name] = $a->value;
+					$ret[$m->tagName][] = $m_atts;
 				}
 			} else {
 				if ( $this->p->debug->enabled )
 					$this->p->debug->log( 'DOMDocument PHP class missing' );
 				if ( is_admin() )
-					$this->p->notice->err( sprintf( 'DOMDocument PHP class missing - unable to read head meta from %s. Please contact your hosting provider to install the missing DOMDocument PHP class.', $url ), true );
+					$this->p->notice->err( sprintf( __( 'The DOMDocument PHP class is missing - unable to read the head meta from %s. Please contact your hosting provider to install the missing DOMDocument PHP class.', 'wpsso' ), $url ), true );
 			}
 			return $ret;
 		}
@@ -623,8 +670,10 @@ if ( ! class_exists( 'WpssoUtil' ) && class_exists( 'SucomUtil' ) ) {
 					$ret = false;
 			}
 			$ret = apply_filters( $this->p->cf['lca'].'_force_default_author', $ret, $use_post, $opt_pre );
+
 			if ( $ret === true && $this->p->debug->enabled )
 				$this->p->debug->log( 'default author is forced' );
+
 			return $ret;
 		}
 
@@ -753,7 +802,7 @@ if ( ! class_exists( 'WpssoUtil' ) && class_exists( 'SucomUtil' ) ) {
 		public static function save_time( $lca, $version, $type, $protect = false ) {
 			if ( ! is_bool( $protect ) ) {
 				if ( ! empty( $protect ) ) {
-					if ( ( $ts_version = SucomUtil::get_option_key( WPSSO_TS_NAME, $lca.'_'.$type.'_version' ) ) !== false &&
+					if ( ( $ts_version = SucomUtil::get_option_key( WPSSO_TS_NAME, $lca.'_'.$type.'_version' ) ) !== null &&
 						version_compare( $ts_version, $protect, '==' ) )
 							$protect = true;
 					else $protect = false;

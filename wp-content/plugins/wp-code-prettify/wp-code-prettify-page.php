@@ -143,6 +143,10 @@ function WPCodePrettify_Options_Page() {
 		<th scope="row"><?php _e('You can add custom css here.', 'wp-code-prettify'); ?></th>
 		<td colspan="2"><textarea cols="75" rows="5" name="style_custom"><?php echo stripslashes($wp_code_prettify['style_custom']); ?></textarea></td>
 		</tr>
+		<tr>
+		<th scope="row"><?php _e('You can add custom HTML into head section.', 'wp-code-prettify'); ?></th>
+		<td colspan="2"><textarea cols="75" rows="5" name="head_custom"><?php echo stripslashes($wp_code_prettify['head_custom']); ?></textarea></td>
+		</tr>
 	</table>
 
 	<p class="submit">

@@ -2,7 +2,7 @@
 /*
  * License: GPLv3
  * License URI: http://www.gnu.org/licenses/gpl.txt
- * Copyright 2012-2015 - Jean-Sebastien Morisset - http://surniaulula.com/
+ * Copyright 2012-2016 Jean-Sebastien Morisset (http://surniaulula.com/)
  */
 
 if ( ! defined( 'ABSPATH' ) ) 
@@ -17,10 +17,10 @@ if ( ! class_exists( 'WpssoLoader' ) ) {
 		public function __construct( &$plugin, $activate = false ) {
 			$this->p =& $plugin;
 			if ( $this->p->debug->enabled )
-				$this->p->debug->mark( 'load modules' );
+				$this->p->debug->mark( 'load modules' );	// begin timer
 			$this->modules();
 			if ( $this->p->debug->enabled )
-				$this->p->debug->mark( 'load modules' );
+				$this->p->debug->mark( 'load modules' );	// end timer
 		}
 
 		private function modules() {

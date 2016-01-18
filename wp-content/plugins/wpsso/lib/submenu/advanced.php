@@ -2,7 +2,7 @@
 /*
  * License: GPLv3
  * License URI: http://www.gnu.org/licenses/gpl.txt
- * Copyright 2012-2015 - Jean-Sebastien Morisset - http://surniaulula.com/
+ * Copyright 2012-2016 Jean-Sebastien Morisset (http://surniaulula.com/)
  */
 
 if ( ! defined( 'ABSPATH' ) ) 
@@ -12,11 +12,13 @@ if ( ! class_exists( 'WpssoSubmenuAdvanced' ) && class_exists( 'WpssoAdmin' ) ) 
 
 	class WpssoSubmenuAdvanced extends WpssoAdmin {
 
-		public function __construct( &$plugin, $id, $name ) {
+		public function __construct( &$plugin, $id, $name, $lib ) {
 			$this->p =& $plugin;
-			$this->p->debug->mark();
+			if ( $this->p->debug->enabled )
+				$this->p->debug->mark();
 			$this->menu_id = $id;
 			$this->menu_name = $name;
+			$this->menu_lib = $lib;
 		}
 
 		protected function add_meta_boxes() {
@@ -88,18 +90,19 @@ if ( ! class_exists( 'WpssoSubmenuAdvanced' ) && class_exists( 'WpssoAdmin' ) ) 
 				case 'plugin-settings':
 
 					$rows['plugin_preserve'] = $this->p->util->get_th( _x( 'Preserve Settings on Uninstall',
-						'option label', 'wpsso' ), 'highlight', 'plugin_preserve' ).
+						'option label', 'wpsso' ), null, 'plugin_preserve' ).
 					'<td>'.$this->form->get_checkbox( 'plugin_preserve' ).'</td>';
 
 					$rows['plugin_debug'] = $this->p->util->get_th( _x( 'Add Hidden Debug Messages', 
 						'option label', 'wpsso' ), null, 'plugin_debug' ).
-					'<td>'.( defined( 'WPSSO_HTML_DEBUG' ) && WPSSO_HTML_DEBUG ? 
+					'<td>'.( SucomUtil::get_const( 'WPSSO_HTML_DEBUG' ) ? 
 						$this->form->get_no_checkbox( 'plugin_debug' ).' WPSSO_HTML_DEBUG constant enabled' :
 						$this->form->get_checkbox( 'plugin_debug' ) ).'</td>';
 
 					$rows['plugin_show_opts'] = $this->p->util->get_th( _x( 'Options to Show by Default',
 						'option label', 'wpsso' ), null, 'plugin_show_opts' ).
-					'<td>'.$this->form->get_select( 'plugin_show_opts', $this->p->cf['form']['show_options'] ).'</td>';
+					'<td>'.$this->form->get_select( 'plugin_show_opts', 
+						$this->p->cf['form']['show_options'] ).'</td>';
 
 					break;
 			}

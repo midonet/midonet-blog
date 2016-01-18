@@ -2,7 +2,7 @@
 /*
  * License: GPLv3
  * License URI: http://www.gnu.org/licenses/gpl.txt
- * Copyright 2012-2015 - Jean-Sebastien Morisset - http://surniaulula.com/
+ * Copyright 2012-2016 Jean-Sebastien Morisset (http://surniaulula.com/)
  */
 
 if ( ! defined( 'ABSPATH' ) ) 
@@ -44,15 +44,17 @@ if ( ! class_exists( 'WpssoGplAdminGeneral' ) ) {
 			'<td class="blank">'.$this->p->options['og_vid_max'].'</td>';
 	
 			$rows[] = '<tr class="hide_in_basic">'.
-			$this->p->util->get_th( _x( 'Use HTTPS for Video API Calls',
+			$this->p->util->get_th( _x( 'Use HTTPS for Video API',
 				'option label', 'wpsso' ), null, 'og_vid_https' ).
-			'<td class="blank"><input type="checkbox" disabled="disabled" /></td>';
+			'<td class="blank"><input type="checkbox" disabled="disabled" /> '.
+				sprintf( _x( 'uses %s', 'option comment', 'wpsso' ),
+					str_replace( WPSSO_PLUGINDIR, WPSSO_PLUGINSLUG.'/', WPSSO_CURL_CAINFO ) ).'</td>';
 
 			$rows[] = $this->p->util->get_th( _x( 'Include Video Preview Image(s)',
 				'option label', 'wpsso' ), null, 'og_vid_prev_img' ).
-			'<td class="blank"><input type="checkbox" disabled="disabled" />'.
-			' '._x( 'video preview images are included first',
-				'option comment', 'wpsso' ).'</td>';
+			'<td class="blank"><input type="checkbox" disabled="disabled" />'.' '.
+				_x( 'video preview images are included first',
+					'option comment', 'wpsso' ).'</td>';
 
 			$rows[] = $this->p->util->get_th( _x( 'Include Embed text/html Type',
 				'option label', 'wpsso' ), null, 'og_vid_html_type' ).

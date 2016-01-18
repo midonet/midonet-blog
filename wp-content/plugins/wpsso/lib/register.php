@@ -2,7 +2,7 @@
 /*
  * License: GPLv3
  * License URI: http://www.gnu.org/licenses/gpl.txt
- * Copyright 2012-2015 - Jean-Sebastien Morisset - http://surniaulula.com/
+ * Copyright 2012-2016 Jean-Sebastien Morisset (http://surniaulula.com/)
  */
 
 if ( ! defined( 'ABSPATH' ) ) 
@@ -129,13 +129,17 @@ if ( ! class_exists( 'WpssoRegister' ) ) {
 		}
 
 		private function deactivate_plugin() {
+
 			// clear all cached objects and transients
 			$this->p->util->delete_expired_db_transients( true );
 			$this->p->util->delete_expired_file_cache( true );
-			$this->p->notice->trunc();
+
+			// trunc all stored notices for all users
+			$this->p->notice->trunc_all();
 		}
 
 		private static function uninstall_plugin() {
+
 			$var_const = WpssoConfig::get_variable_constants();
 			$opts = get_option( $var_const['WPSSO_OPTIONS_NAME'], array() );
 

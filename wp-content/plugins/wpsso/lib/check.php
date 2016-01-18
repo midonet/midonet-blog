@@ -2,7 +2,7 @@
 /*
  * License: GPLv3
  * License URI: http://www.gnu.org/licenses/gpl.txt
- * Copyright 2012-2015 - Jean-Sebastien Morisset - http://surniaulula.com/
+ * Copyright 2012-2016 Jean-Sebastien Morisset (http://surniaulula.com/)
  */
 
 if ( ! defined( 'ABSPATH' ) ) 
@@ -157,12 +157,6 @@ if ( ! class_exists( 'WpssoCheck' ) ) {
 							$chk['class'] = 'nggdb';	// C_NextGEN_Bootstrap
 							$chk['plugin'] = 'nextgen-gallery/nggallery.php';
 							break;
-						case 'media-photon':
-							if ( class_exists( 'Jetpack' ) && 
-								method_exists( 'Jetpack', 'get_active_modules' ) && 
-								in_array( 'photon', Jetpack::get_active_modules() ) )
-									$ret[$sub]['*'] = $ret[$sub][$id] = true;
-							break;
 						case 'seo-aioseop':
 							$chk['class'] = 'All_in_One_SEO_Pack';
 							break;
@@ -190,6 +184,9 @@ if ( ! class_exists( 'WpssoCheck' ) ) {
 							break;
 						case 'media-slideshare':
 							$chk['optval'] = 'plugin_slideshare_api';
+							break;
+						case 'media-upscale':
+							$chk['optval'] = 'plugin_upscale_images';
 							break;
 						case 'media-vimeo':
 							$chk['optval'] = 'plugin_vimeo_api';

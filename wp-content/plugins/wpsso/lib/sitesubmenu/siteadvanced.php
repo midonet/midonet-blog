@@ -2,7 +2,7 @@
 /*
  * License: GPLv3
  * License URI: http://www.gnu.org/licenses/gpl.txt
- * Copyright 2012-2015 - Jean-Sebastien Morisset - http://surniaulula.com/
+ * Copyright 2012-2016 Jean-Sebastien Morisset (http://surniaulula.com/)
  */
 
 if ( ! defined( 'ABSPATH' ) ) 
@@ -12,11 +12,13 @@ if ( ! class_exists( 'WpssoSitesubmenuSiteadvanced' ) && class_exists( 'WpssoAdm
 
 	class WpssoSitesubmenuSiteadvanced extends WpssoAdmin {
 
-		public function __construct( &$plugin, $id, $name ) {
+		public function __construct( &$plugin, $id, $name, $lib ) {
 			$this->p =& $plugin;
-			$this->p->debug->mark();
+			if ( $this->p->debug->enabled )
+				$this->p->debug->mark();
 			$this->menu_id = $id;
 			$this->menu_name = $name;
+			$this->menu_lib = $lib;
 		}
 
 		protected function set_form_property() {
@@ -59,15 +61,15 @@ if ( ! class_exists( 'WpssoSitesubmenuSiteadvanced' ) && class_exists( 'WpssoAdm
 			switch ( $metabox.'-'.$key ) {
 				case 'plugin-settings':
 
+					$rows['plugin_preserve'] = $this->p->util->get_th( _x( 'Preserve Settings on Uninstall',
+						'option label', 'wpsso' ), null, 'plugin_preserve' ).
+					'<td>'.$this->form->get_checkbox( 'plugin_preserve' ).'</td>'.
+					$this->p->admin->get_site_use( $this->form, true, 'plugin_preserve' );
+
 					$rows['plugin_debug'] = $this->p->util->get_th( _x( 'Add Hidden Debug Messages',
 						'option label', 'wpsso' ), null, 'plugin_debug' ).
 					'<td>'.$this->form->get_checkbox( 'plugin_debug' ).'</td>'.
 					$this->p->admin->get_site_use( $this->form, true, 'plugin_debug' );
-
-					$rows['plugin_preserve'] = $this->p->util->get_th( _x( 'Preserve Settings on Uninstall',
-						'option label', 'wpsso' ), 'highlight', 'plugin_preserve' ).
-					'<td>'.$this->form->get_checkbox( 'plugin_preserve' ).'</td>'.
-					$this->p->admin->get_site_use( $this->form, true, 'plugin_preserve' );
 
 					break;
 			}

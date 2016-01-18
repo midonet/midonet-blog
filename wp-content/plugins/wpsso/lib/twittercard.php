@@ -1,14 +1,8 @@
 <?php
 /*
- * IMPORTANT: READ THE LICENSE AGREEMENT CAREFULLY. BY INSTALLING, COPYING,
- * RUNNING, OR OTHERWISE USING THE WORDPRESS SOCIAL SHARING OPTIMIZATION (WPSSO) PRO APPLICATION, YOU
- * AGREE TO BE BOUND BY THE TERMS OF THIS LICENSE AGREEMENT. IF YOU DO NOT AGREE
- * TO THE TERMS OF THIS LICENSE AGREEMENT, PLEASE DO NOT INSTALL, RUN, COPY, OR
- * OTHERWISE USE THE WORDPRESS SOCIAL SHARING OPTIMIZATION (WPSSO) PRO APPLICATION.
- * 
- * License: Nontransferable License for a WordPress Site Address URL
- * License URI: http://surniaulula.com/wp-content/plugins/wpsso/license/pro.txt
- * Copyright 2012-2015 - Jean-Sebastien Morisset - http://surniaulula.com/
+ * License: GPLv3
+ * License URI: http://www.gnu.org/licenses/gpl.txt
+ * Copyright 2012-2016 Jean-Sebastien Morisset (http://surniaulula.com/)
  */
 
 if ( ! defined( 'ABSPATH' ) ) 
@@ -51,7 +45,7 @@ if ( ! class_exists( 'WpssoTwittercard' ) ) {
 			$post_id = empty( $obj->ID ) || empty( $obj->post_type ) || 
 				( ! is_singular() && $use_post === false ) ? 0 : $obj->ID;
 
-			$og_max = $this->p->util->get_max_nums( $post_id, 'post' );	// post_id 0 returns the plugin settings
+			$max = $this->p->util->get_max_nums( $post_id, 'post' );	// a post_id of 0 returns the plugin settings
 			$tc = SucomUtil::preg_grep_keys( '/^twitter:/', $og );		// read any pre-defined twitter card values
 			$tc = apply_filters( $this->p->cf['lca'].'_tc_seed', $tc, $use_post, $obj );
 
@@ -119,7 +113,7 @@ if ( ! class_exists( 'WpssoTwittercard' ) ) {
 			/*
 			 * All Image Cards
 			 */
-			if ( empty( $og_max['og_img_max'] ) ) {
+			if ( empty( $max['og_img_max'] ) ) {
 				if ( $this->p->debug->enabled )
 					$this->p->debug->log( 'images disabled: maximum images = 0' );
 			} else {
@@ -164,7 +158,7 @@ if ( ! class_exists( 'WpssoTwittercard' ) ) {
 							if ( $this->p->debug->enabled )
 								$this->p->debug->log( 'large image card: checking for singlepic image' );
 							$og_image = $this->p->mods['media']['ngg']->get_singlepic_images( 1, 
-								$this->p->cf['lca'].'-tc-lrgimg', false );
+								$this->p->cf['lca'].'-tc-lrgimg', $post_id, false );
 							if ( count( $og_image ) > 0 ) {
 								$image = reset( $og_image );
 								$tc['twitter:card'] = 'summary_large_image';
@@ -181,7 +175,7 @@ if ( ! class_exists( 'WpssoTwittercard' ) ) {
 			 */
 			if ( ! isset( $tc['twitter:card'] ) ) {
 				$tc['twitter:card'] = 'summary';
-				if ( ! empty( $og_max['og_img_max'] ) ) {
+				if ( ! empty( $max['og_img_max'] ) ) {
 					if ( $this->p->debug->enabled )
 						$this->p->debug->log( 'summary card: checking for content image' );
 					$og_image = $this->p->og->get_all_images( 1, $this->p->cf['lca'].'-tc-summary', $post_id, false );

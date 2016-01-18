@@ -3,13 +3,13 @@
 <table>
 <tr><th align="right" valign="top" nowrap>Plugin Name</th><td>WordPress Social Sharing Optimization (WPSSO)</td></tr>
 <tr><th align="right" valign="top" nowrap>Summary</th><td>Fast, light-weight, full-featured plugin for great looking shares on all social sites - no matter how your content is shared or re-shared!</td></tr>
-<tr><th align="right" valign="top" nowrap>Stable Version</th><td>3.18.1</td></tr>
+<tr><th align="right" valign="top" nowrap>Stable Version</th><td>3.21.5</td></tr>
 <tr><th align="right" valign="top" nowrap>Requires At Least</th><td>WordPress 3.1</td></tr>
 <tr><th align="right" valign="top" nowrap>Tested Up To</th><td>WordPress 4.4</td></tr>
 <tr><th align="right" valign="top" nowrap>Contributors</th><td>jsmoriss</td></tr>
 <tr><th align="right" valign="top" nowrap>Website URL</th><td><a href="https://wpsso.com/">https://wpsso.com/</a></td></tr>
 <tr><th align="right" valign="top" nowrap>License</th><td><a href="http://www.gnu.org/licenses/gpl.txt">GPLv3</a></td></tr>
-<tr><th align="right" valign="top" nowrap>Tags / Keywords</th><td>attached, bbPress, buddypress, e-commerce, easy digital downloads, edd, Facebook, featured, g+, gallery, google, google plus, hashtags, imagebrowser, jetpack, JSON-LD, knowledge graph, linkedin, marketpress, meta-tags, multilingual, multisite, nextgen gallery, nggalbum, nggallery, object cache, open graph, photon, pinterest, player card, polylang, rich pins, schema, seo, singlepic, slideshare, social, Summary Card, transient cache, twitter, twitter cards, vimeo, wistia, woocommerce, wpsso, wp_cache, youtube, yotpo</td></tr>
+<tr><th align="right" valign="top" nowrap>Tags / Keywords</th><td>attached, bbPress, buddypress, e-commerce, easy digital downloads, edd, Facebook, featured, g+, gallery, google, google plus, hashtags, imagebrowser, JSON-LD, knowledge graph, linkedin, marketpress, meta-tags, multilingual, multisite, nextgen gallery, nggalbum, nggallery, object cache, open graph, pinterest, player card, polylang, rich pins, schema, seo, singlepic, slideshare, social, Summary Card, transient cache, twitter, twitter cards, vimeo, wistia, woocommerce, wpsso, wp_cache, youtube, yotpo</td></tr>
 </table>
 
 <h2>Description</h2>
@@ -18,7 +18,7 @@
 
 <p><strong>A solid social meta tag plugin is the foundation of any good social strategy</strong> &mdash; WordPress Social Sharing Optimization (WPSSO) gives you total control over all the information <a href="https://developers.facebook.com/docs/sharing/webmasters/crawler">social website crawlers</a> need, improving Google Search ranking, social engagement, and click-through-rates on Facebook, Google+, Twitter, Pinterest, LinkedIn, and many more &mdash; independently of any social sharing buttons you may or may not already use (sharing buttons are not required).</p>
 
-<p><strong>WPSSO automatically retrieves and uses information from a wide range or sources</strong>, including All in One SEO Pack, bbPress, BuddyPress, Easy Digital Downloads, HeadSpace2 SEO, JetPack Photon, NextGEN Gallery, MarketPress - WordPress eCommerce, Polylang, WooCommerce, Yoast SEO (aka WordPress SEO), WP e-Commerce, Gravatar, Slideshare, Vimeo, Wistia, YouTube, extends the WordPress REST API v2, and much more.</p>
+<p><strong>WPSSO automatically retrieves and uses information from a wide range or sources</strong>, including All in One SEO Pack, bbPress, BuddyPress, Easy Digital Downloads, HeadSpace2 SEO, NextGEN Gallery, MarketPress - WordPress eCommerce, Polylang, WooCommerce, Yoast SEO (aka WordPress SEO), WP e-Commerce, Gravatar, Slideshare, Vimeo, Wistia, YouTube, extends the WordPress REST API version 2, and much more.</p>
 
 <h4>Available in Multiple Languages</h4>
 
@@ -144,13 +144,12 @@
 <li>BuddyPress</li>
 <li>Easy Digital Downloads</li>
 <li>HeadSpace2 SEO</li>
-<li>JetPack Photon</li>
 <li>NextGEN Gallery</li>
 <li>MarketPress - WordPress eCommerce</li>
 <li>Polylang</li>
-<li><a href="https://wordpress.org/plugins/woocommerce/">WooCommerce v1 and v2</a></li>
+<li><a href="https://wordpress.org/plugins/woocommerce/">WooCommerce versions 1 and 2</a></li>
 <li>WP e-Commerce</li>
-<li><a href="https://wordpress.org/plugins/rest-api/">WordPress REST API v2</a></li>
+<li><a href="https://wordpress.org/plugins/rest-api/">WordPress REST API version 2</a></li>
 <li>Yoast SEO (aka WordPress SEO)</li>
 <li>Yotpo Social Reviews for WooCommerce</li>
 </ul></li>
@@ -222,7 +221,7 @@
 
 <p>WPSSO detects and uses all images - associated or included in your content - including the WordPress image gallery and NextGEN Gallery shortcodes. WordPress Media Library images (and NextGEN Gallery in the Pro version) are resized according to their intended audience (Facebook, Twitter, Pinterest, etc). The Pro version also detects embedded videos from Slideshare, Vimeo, Wistia, and Youtube (including their preview images).</p>
 
-<p>WPSSO (Pro version) also includes support for <a href="http://jetpack.me/support/photon/">JetPack Photon</a> and <a href="https://wordpress.org/plugins/nextgen-gallery/">NextGEN Gallery v1 and v2</a> albums, galleries and images (shortcodes, image tags, album / gallery preview images, etc.).</p>
+<p>WPSSO (Pro version) also includes support for <a href="https://wordpress.org/plugins/nextgen-gallery/">NextGEN Gallery versions 1 and 2</a> albums, galleries and images (shortcodes, image tags, album / gallery preview images, etc.).</p>
 
 <p><strong>Enhanced SEO</strong></p>
 
@@ -236,7 +235,7 @@
 
 <p><strong>eCommerce Products</strong></p>
 
-<p>WPSSO (Pro version) also supports <a href="https://wordpress.org/plugins/easy-digital-downloads/">Easy Digital Downloads</a>, <a href="https://wordpress.org/plugins/wordpress-ecommerce/">MarketPress - WordPress eCommerce</a>, <a href="https://wordpress.org/plugins/woocommerce/">WooCommerce v1 and v2</a>, and <a href="https://wordpress.org/plugins/wp-e-commerce/">WP e-Commerce</a> product pages, creating appropriate meta tags for <a href="https://developers.facebook.com/docs/payments/product/">Facebook Products</a>, <a href="https://dev.twitter.com/docs/cards/types/product-card">Twitter Product Cards</a> and <a href="http://developers.pinterest.com/rich_pins/">Pinterest Rich Pins</a>, including variations and additional / custom images.</p>
+<p>WPSSO (Pro version) also supports <a href="https://wordpress.org/plugins/easy-digital-downloads/">Easy Digital Downloads</a>, <a href="https://wordpress.org/plugins/wordpress-ecommerce/">MarketPress - WordPress eCommerce</a>, <a href="https://wordpress.org/plugins/woocommerce/">WooCommerce versions 1 and 2</a>, and <a href="https://wordpress.org/plugins/wp-e-commerce/">WP e-Commerce</a> product pages, creating appropriate meta tags for <a href="https://developers.facebook.com/docs/payments/product/">Facebook Products</a>, <a href="https://dev.twitter.com/docs/cards/types/product-card">Twitter Product Cards</a> and <a href="http://developers.pinterest.com/rich_pins/">Pinterest Rich Pins</a>, including variations and additional / custom images.</p>
 
 <p><strong>Forums and Social</strong></p>
 
@@ -267,6 +266,7 @@
 <li><a href="http://wpsso.com/codex/plugins/wpsso/installation/integration/buddypress-integration/">BuddyPress Integration</a></li>
 </ul></li>
 <li><a href="http://wpsso.com/codex/plugins/wpsso/installation/uninstall-the-plugin/">Uninstall the Plugin</a></li>
+<li><a href="http://wpsso.com/codex/plugins/wpsso/installation/performance-tuning/">Performance Tuning</a></li>
 <li><a href="http://wpsso.com/codex/plugins/wpsso/installation/debugging-and-problem-solving/">Debugging and Problem Solving</a></li>
 <li><a href="http://wpsso.com/codex/plugins/wpsso/installation/migrate-from-ngfb/">How-To Migrate from NGFB to WPSSO</a></li>
 <li><a href="http://wpsso.com/codex/plugins/wpsso/installation/developer-special-buy-one-get-one-free/">Developer Special – Buy one, Get one Free</a></li>
@@ -296,6 +296,7 @@
 <li><a href="http://wpsso.com/codex/plugins/wpsso/faq/how-do-i-attach-an-image-without-showing-it-on-the-webpage/">How do I attach an image without showing it on the webpage?</a></li>
 <li><a href="http://wpsso.com/codex/plugins/wpsso/faq/how-do-i-fix-my-themes-front-page-pagination/">How do I fix my theme’s front page pagination?</a></li>
 <li><a href="http://wpsso.com/codex/plugins/wpsso/faq/how-do-i-install-the-wpsso-pro-version/">How do I install the WPSSO Pro version?</a></li>
+<li><a href="http://wpsso.com/codex/plugins/wpsso/faq/how-do-i-remove-duplicate-meta-tags/">How do I remove duplicate meta tags?</a></li>
 <li><a href="http://wpsso.com/codex/plugins/wpsso/faq/how-does-wpsso-find-detect-select-images/">How does WPSSO find / detect / select images?</a></li>
 <li><a href="http://wpsso.com/codex/plugins/wpsso/faq/w3c-says-there-is-no-attribute-property/">W3C says “there is no attribute ‘property’”</a></li>
 <li><a href="http://wpsso.com/codex/plugins/wpsso/faq/what-about-google-search-and-google-plus/">What about Google Search and Google Plus?</a></li>
@@ -333,10 +334,9 @@
 <li><a href="http://wpsso.com/codex/plugins/wpsso/notes/modules/author-gravatar/">Author Gravatar</a></li>
 <li><a href="http://wpsso.com/codex/plugins/wpsso/notes/modules/easy-digital-downloads/">Easy Digital Downloads</a></li>
 <li><a href="http://wpsso.com/codex/plugins/wpsso/notes/modules/headspace2-seo/">HeadSpace2 SEO</a></li>
-<li><a href="http://wpsso.com/codex/plugins/wpsso/notes/modules/jetpack-photon/">Jetpack Photon</a></li>
 <li><a href="http://wpsso.com/codex/plugins/wpsso/notes/modules/slideshare-vimeo-wistia-youtube-apis/">Slideshare, Vimeo, Wistia, Youtube APIs</a></li>
 <li><a href="http://wpsso.com/codex/plugins/wpsso/notes/modules/woocommerce/">WooCommerce</a></li>
-<li><a href="http://wpsso.com/codex/plugins/wpsso/notes/modules/wordpress-rest-api-v2/">WordPress REST API v2</a></li>
+<li><a href="http://wpsso.com/codex/plugins/wpsso/notes/modules/wordpress-rest-api-v2/">WordPress REST API version 2</a></li>
 </ul></li>
 <li><a href="http://wpsso.com/codex/plugins/wpsso/notes/contact-information/">Contact Information and Feeds</a></li>
 <li><a href="http://wpsso.com/codex/plugins/wpsso/notes/developer/">Developer Resources</a>
@@ -354,6 +354,7 @@
 <li><a href="http://wpsso.com/codex/plugins/wpsso/notes/developer/filters/examples/modify-the-articletag-keywords-names/">Modify the article:tag Keywords / Names</a></li>
 <li><a href="http://wpsso.com/codex/plugins/wpsso/notes/developer/filters/examples/modify-the-default-topics-list/">Modify the Default Topics List</a></li>
 <li><a href="http://wpsso.com/codex/plugins/wpsso/notes/developer/filters/examples/modify-the-home-page-title-for-facebook-open-graph/">Modify the Home Page Title for Facebook / Open Graph</a></li>
+<li><a href="http://wpsso.com/codex/plugins/wpsso/notes/developer/filters/examples/use-the-request_uri-for-post-urls/">Use the REQUEST_URI for Post URLs</a></li>
 <li><a href="http://wpsso.com/codex/plugins/wpsso/notes/developer/filters/examples/working-with-pre-defined-meta-tags-and-custom-post-types/">Working with Pre-defined Meta Tags and Custom Post Types</a></li>
 </ul></li>
 <li><a href="http://wpsso.com/codex/plugins/wpsso/notes/developer/filters/by-category/">Filters by Category</a>
@@ -371,7 +372,6 @@
 </ul></li>
 <li><a href="http://wpsso.com/codex/plugins/wpsso/notes/inline-variables/">Inline Variables</a></li>
 <li><a href="http://wpsso.com/codex/plugins/wpsso/notes/multisite-network-support/">Multisite / Network Support</a></li>
-<li><a href="http://wpsso.com/codex/plugins/wpsso/notes/performance-tuning/">Performance Tuning</a></li>
 <li><a href="http://wpsso.com/codex/plugins/wpsso/notes/working-with-image-attachments/">Working with Image Attachments</a></li>
 </ul>
 

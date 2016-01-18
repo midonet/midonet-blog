@@ -2,7 +2,7 @@
 /*
  * License: GPLv3
  * License URI: http://www.gnu.org/licenses/gpl.txt
- * Copyright 2012-2015 - Jean-Sebastien Morisset - http://surniaulula.com/
+ * Copyright 2012-2016 Jean-Sebastien Morisset (http://surniaulula.com/)
  */
 
 if ( ! defined( 'ABSPATH' ) ) 
@@ -138,6 +138,9 @@ if ( ! class_exists( 'WpssoHead' ) ) {
 		}
 
 		public function get_header_array( $use_post = false, $read_cache = true, &$mt_og = array() ) {
+			if ( $this->p->debug->enabled )
+				$this->p->debug->mark( 'build header array' );	// begin timer
+
 			$lca = $this->p->cf['lca'];
 			$short_aop = $this->p->cf['plugin'][$lca]['short'].
 				( $this->p->is_avail['aop'] ? ' Pro' : '' );
@@ -263,8 +266,8 @@ if ( ! class_exists( 'WpssoHead' ) ) {
 				$this->get_mt_array( 'meta', 'name', $mt_tc, $use_post ),
 				$this->get_mt_array( 'meta', 'itemprop', $mt_schema, $use_post ),
 				$this->get_mt_array( 'meta', 'name', $mt_name, $use_post ),	// seo description is last
-				$this->p->schema->get_noscript_array( $use_post, $obj, $mt_og ),
-				$this->p->schema->get_json_array( $post_id, $author_id, $this->p->cf['lca'].'-schema' )
+				$this->p->schema->get_noscript_array( $use_post, $obj, $mt_og, $post_id, $author_id ),
+				$this->p->schema->get_json_array( $use_post, $obj, $mt_og, $post_id, $author_id )
 			);
 
 			/*
@@ -276,6 +279,9 @@ if ( ! class_exists( 'WpssoHead' ) ) {
 					$this->p->debug->log( $cache_type.': header array saved to transient '.
 						$cache_id.' ('.$this->p->options['plugin_object_cache_exp'].' seconds)');
 			}
+
+			if ( $this->p->debug->enabled )
+				$this->p->debug->mark( 'build header array' );	// end timer
 
 			return $header_array;
 		}
@@ -325,6 +331,7 @@ if ( ! class_exists( 'WpssoHead' ) ) {
 			$ret = array();
 			$attr = $tag === 'link' ? 'href' : 'content';
 			$log_pre = $tag.' '.$type.' '.$name;
+			$charset = get_bloginfo( 'charset' );
 
 			if ( is_array( $value ) ) {
 				if ( $this->p->debug->enabled )
@@ -340,35 +347,30 @@ if ( ! class_exists( 'WpssoHead' ) ) {
 			if ( strpos( $value, '%%' ) )
 				$value = $this->p->util->replace_inline_vars( $value, $use_post );
 
-			$charset = get_bloginfo( 'charset' );
-			$value = htmlentities( $value, ENT_QUOTES, $charset, false );	// double_encode = false
-
-			// add secure_url meta tag for open graph images and videos
-			if ( $tag === 'meta' && 
-				$type === 'property' && 
-				strpos( $value, 'https:' ) === 0 ) {
-
-				switch ( $name ) {
-					case 'og:image':
-					case 'og:image:url':
-					case 'og:video':
-					case 'og:video:url':
+			switch ( $name ) {
+				case 'og:image':
+				case 'og:image:url':
+				case 'og:video':
+				case 'og:video:url':
+					// add secure_url meta tag for open graph images and videos
+					if ( strpos( $value, 'https://' ) === 0 ) {
 						$secure_value = $value;
 						$secure_name = preg_replace( '/:url$/', '', $name ).':secure_url';
 						$value = preg_replace( '/^https:/', 'http:', $value );
 						$ret[] = array( '', $tag, $type, $secure_name, $attr, $secure_value, $cmt );
-						break;
-				}
+					}
+					break;
 			}
 			$ret[] = array( '', $tag, $type, $name, $attr, $value, $cmt );
 
 			// filtering of single meta tags can be enabled by defining WPSSO_FILTER_SINGLE_TAGS as true
-			if ( defined( 'WPSSO_FILTER_SINGLE_TAGS' ) && WPSSO_FILTER_SINGLE_TAGS )
+			if ( SucomUtil::get_const( 'WPSSO_FILTER_SINGLE_TAGS' ) )
 				$ret = $this->filter_single_mt( $ret, $use_post );
 
 			// $parts = array( $html, $tag, $type, $name, $attr, $value, $cmt );
 			foreach ( $ret as $num => $parts ) {
 				$log_pre = $parts[1].' '.$parts[2].' '.$parts[3];
+
 				if ( $this->p->debug->enabled )
 					$this->p->debug->log( $log_pre.' = "'.$parts[5].'"' );
 
@@ -381,8 +383,45 @@ if ( ! class_exists( 'WpssoHead' ) ) {
 						$this->p->debug->log( $log_pre.' value is -1 (skipped)' );
 
 				} elseif ( ! empty( $this->p->options['add_'.$parts[1].'_'.$parts[2].'_'.$parts[3]] ) ) {
+
+					// change meta itemtype "image.url" to "url" (for example)
+					if ( $parts[1] === 'meta' && 
+						$parts[2] === 'itemprop' && 
+							strpos( $parts[3], '.' ) !== 0 )
+								$parts[3] = preg_replace( '/^.*\./', '', $parts[3] );
+
+					switch ( $parts[3] ) {
+						case 'og:url':
+						case 'og:image':
+						case 'og:image:url':
+						case 'og:image:secure_url':
+						case 'og:video':
+						case 'og:video:url':
+						case 'og:video:url:secure_url':
+						case 'og:video:url:embed_url':
+						case 'twitter:image':
+						case 'twitter:player':
+						case 'canonical':
+						case 'url':
+							$parts[5] = SucomUtil::esc_url_encode( $parts[5] );
+							break;
+						case 'og:title':
+						case 'og:description':
+						case 'twitter:title':
+						case 'twitter:description':
+						case 'description':
+						case 'name':
+							$parts[5] = SucomUtil::encode_emoji( htmlentities( $parts[5],
+								ENT_QUOTES, $charset, false ) );	// double_encode = false
+						default:
+							$parts[5] = htmlentities( $parts[5],
+								ENT_QUOTES, $charset, false );		// double_encode = false
+							break;
+					}
+
 					$parts[0] = ( empty( $parts[6] ) ? '' : '<!-- '.$parts[6].' -->' ).
 						'<'.$parts[1].' '.$parts[2].'="'.$parts[3].'" '.$parts[4].'="'.$parts[5].'"/>'."\n";
+
 					$ret[$num] = $parts;
 
 				} elseif ( $this->p->debug->enabled )

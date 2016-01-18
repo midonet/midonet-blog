@@ -330,6 +330,60 @@ class MC4WP_API {
 	}
 
 	/**
+	 * @see https://apidocs.mailchimp.com/api/2.0/ecomm/order-add.php
+	 *
+	 * @param array $order_data
+	 *
+	 * @return boolean
+	 */
+	public function add_ecommerce_order( array $order_data ) {
+		$response = $this->call( 'ecomm/order-add', array( 'order' => $order_data ) );
+
+		if( is_object( $response ) ) {
+
+			// complete means success
+			if ( isset( $response->complete ) && $response->complete ) {
+				return true;
+			}
+
+			// 330 means order was already added: great
+			if( isset( $response->code ) && $response->code == 330 ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * @see https://apidocs.mailchimp.com/api/2.0/ecomm/order-del.php
+	 *
+	 * @param string $store_id
+	 * @param string $order_id
+	 *
+	 * @return bool
+	 */
+	public function delete_ecommerce_order( $store_id, $order_id ) {
+
+		$data = array(
+			'store_id' => $store_id,
+			'order_id' => $order_id
+		);
+
+		$response = $this->call( 'ecomm/order-del', $data );
+
+		if( is_object( $response ) ) {
+			if ( isset( $response->complete ) && $response->complete ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+
+
+	/**
 	 * Calls the MailChimp API
 	 *
 	 * @uses WP_HTTP

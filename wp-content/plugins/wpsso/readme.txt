@@ -5,12 +5,12 @@ Text Domain: wpsso
 Domain Path: /languages
 Contributors: jsmoriss
 Donate Link: https://wpsso.com/
-Tags: attached, bbPress, buddypress, e-commerce, easy digital downloads, edd, Facebook, featured, g+, gallery, google, google plus, hashtags, imagebrowser, jetpack, JSON-LD, knowledge graph, linkedin, marketpress, meta-tags, multilingual, multisite, nextgen gallery, nggalbum, nggallery, object cache, open graph, photon, pinterest, player card, polylang, rich pins, schema, seo, singlepic, slideshare, social, Summary Card, transient cache, twitter, twitter cards, vimeo, wistia, woocommerce, wpsso, wp_cache, youtube, yotpo
+Tags: attached, bbPress, buddypress, e-commerce, easy digital downloads, edd, Facebook, featured, g+, gallery, google, google plus, hashtags, imagebrowser, JSON-LD, knowledge graph, linkedin, marketpress, meta-tags, multilingual, multisite, nextgen gallery, nggalbum, nggallery, object cache, open graph, pinterest, player card, polylang, rich pins, schema, seo, singlepic, slideshare, social, Summary Card, transient cache, twitter, twitter cards, vimeo, wistia, woocommerce, wpsso, wp_cache, youtube, yotpo
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.txt
 Requires At Least: 3.1
 Tested Up To: 4.4
-Stable Tag: 3.18.1
+Stable Tag: 3.21.5
 
 Fast, light-weight, full-featured plugin for great looking shares on all social sites - no matter how your content is shared or re-shared!
 
@@ -20,7 +20,7 @@ Fast, light-weight, full-featured plugin for great looking shares on all social 
 
 **A solid social meta tag plugin is the foundation of any good social strategy** &mdash; WordPress Social Sharing Optimization (WPSSO) gives you total control over all the information [social website crawlers](https://developers.facebook.com/docs/sharing/webmasters/crawler) need, improving Google Search ranking, social engagement, and click-through-rates on Facebook, Google+, Twitter, Pinterest, LinkedIn, and many more &mdash; independently of any social sharing buttons you may or may not already use (sharing buttons are not required).
 
-**WPSSO automatically retrieves and uses information from a wide range or sources**, including All in One SEO Pack, bbPress, BuddyPress, Easy Digital Downloads, HeadSpace2 SEO, JetPack Photon, NextGEN Gallery, MarketPress - WordPress eCommerce, Polylang, WooCommerce, Yoast SEO (aka WordPress SEO), WP e-Commerce, Gravatar, Slideshare, Vimeo, Wistia, YouTube, extends the WordPress REST API v2, and much more.
+**WPSSO automatically retrieves and uses information from a wide range or sources**, including All in One SEO Pack, bbPress, BuddyPress, Easy Digital Downloads, HeadSpace2 SEO, NextGEN Gallery, MarketPress - WordPress eCommerce, Polylang, WooCommerce, Yoast SEO (aka WordPress SEO), WP e-Commerce, Gravatar, Slideshare, Vimeo, Wistia, YouTube, extends the WordPress REST API version 2, and much more.
 
 = Available in Multiple Languages =
 
@@ -124,13 +124,12 @@ Fast, light-weight, full-featured plugin for great looking shares on all social 
 		* BuddyPress
 		* Easy Digital Downloads
 		* HeadSpace2 SEO
-		* JetPack Photon
 		* NextGEN Gallery
 		* MarketPress - WordPress eCommerce
 		* Polylang
-		* <a href="https://wordpress.org/plugins/woocommerce/">WooCommerce v1 and v2</a>
+		* <a href="https://wordpress.org/plugins/woocommerce/">WooCommerce versions 1 and 2</a>
 		* WP e-Commerce
-		* <a href="https://wordpress.org/plugins/rest-api/">WordPress REST API v2</a>
+		* <a href="https://wordpress.org/plugins/rest-api/">WordPress REST API version 2</a>
 		* Yoast SEO (aka WordPress SEO)
 		* Yotpo Social Reviews for WooCommerce
 	* **Supported Service APIs**
@@ -192,7 +191,7 @@ Aside from the additional support for Twitter Cards, the main difference between
 
 WPSSO detects and uses all images - associated or included in your content - including the WordPress image gallery and NextGEN Gallery shortcodes. WordPress Media Library images (and NextGEN Gallery in the Pro version) are resized according to their intended audience (Facebook, Twitter, Pinterest, etc). The Pro version also detects embedded videos from Slideshare, Vimeo, Wistia, and Youtube (including their preview images).
 
-WPSSO (Pro version) also includes support for [JetPack Photon](http://jetpack.me/support/photon/) and [NextGEN Gallery v1 and v2](https://wordpress.org/plugins/nextgen-gallery/) albums, galleries and images (shortcodes, image tags, album / gallery preview images, etc.).
+WPSSO (Pro version) also includes support for [NextGEN Gallery versions 1 and 2](https://wordpress.org/plugins/nextgen-gallery/) albums, galleries and images (shortcodes, image tags, album / gallery preview images, etc.).
 
 **Enhanced SEO**
 
@@ -205,7 +204,7 @@ WPSSO (Pro version) integrates with [Yoast SEO](https://wordpress.org/plugins/wo
 
 **eCommerce Products**
 
-WPSSO (Pro version) also supports [Easy Digital Downloads](https://wordpress.org/plugins/easy-digital-downloads/), [MarketPress - WordPress eCommerce](https://wordpress.org/plugins/wordpress-ecommerce/), [WooCommerce v1 and v2](https://wordpress.org/plugins/woocommerce/), and [WP e-Commerce](https://wordpress.org/plugins/wp-e-commerce/) product pages, creating appropriate meta tags for [Facebook Products](https://developers.facebook.com/docs/payments/product/), [Twitter Product Cards](https://dev.twitter.com/docs/cards/types/product-card) and [Pinterest Rich Pins](http://developers.pinterest.com/rich_pins/), including variations and additional / custom images.
+WPSSO (Pro version) also supports [Easy Digital Downloads](https://wordpress.org/plugins/easy-digital-downloads/), [MarketPress - WordPress eCommerce](https://wordpress.org/plugins/wordpress-ecommerce/), [WooCommerce versions 1 and 2](https://wordpress.org/plugins/woocommerce/), and [WP e-Commerce](https://wordpress.org/plugins/wp-e-commerce/) product pages, creating appropriate meta tags for [Facebook Products](https://developers.facebook.com/docs/payments/product/), [Twitter Product Cards](https://dev.twitter.com/docs/cards/types/product-card) and [Pinterest Rich Pins](http://developers.pinterest.com/rich_pins/), including variations and additional / custom images.
 
 **Forums and Social**
 
@@ -231,6 +230,7 @@ Follow Surnia Ulula on [Google+](https://plus.google.com/+SurniaUlula/?rel=autho
 * [Integration Notes](http://wpsso.com/codex/plugins/wpsso/installation/integration/)
 	* [BuddyPress Integration](http://wpsso.com/codex/plugins/wpsso/installation/integration/buddypress-integration/)
 * [Uninstall the Plugin](http://wpsso.com/codex/plugins/wpsso/installation/uninstall-the-plugin/)
+* [Performance Tuning](http://wpsso.com/codex/plugins/wpsso/installation/performance-tuning/)
 * [Debugging and Problem Solving](http://wpsso.com/codex/plugins/wpsso/installation/debugging-and-problem-solving/)
 * [How-To Migrate from NGFB to WPSSO](http://wpsso.com/codex/plugins/wpsso/installation/migrate-from-ngfb/)
 * [Developer Special – Buy one, Get one Free](http://wpsso.com/codex/plugins/wpsso/installation/developer-special-buy-one-get-one-free/)
@@ -255,6 +255,7 @@ Follow Surnia Ulula on [Google+](https://plus.google.com/+SurniaUlula/?rel=autho
 * [How do I attach an image without showing it on the webpage?](http://wpsso.com/codex/plugins/wpsso/faq/how-do-i-attach-an-image-without-showing-it-on-the-webpage/)
 * [How do I fix my theme’s front page pagination?](http://wpsso.com/codex/plugins/wpsso/faq/how-do-i-fix-my-themes-front-page-pagination/)
 * [How do I install the WPSSO Pro version?](http://wpsso.com/codex/plugins/wpsso/faq/how-do-i-install-the-wpsso-pro-version/)
+* [How do I remove duplicate meta tags?](http://wpsso.com/codex/plugins/wpsso/faq/how-do-i-remove-duplicate-meta-tags/)
 * [How does WPSSO find / detect / select images?](http://wpsso.com/codex/plugins/wpsso/faq/how-does-wpsso-find-detect-select-images/)
 * [W3C says “there is no attribute ‘property’”](http://wpsso.com/codex/plugins/wpsso/faq/w3c-says-there-is-no-attribute-property/)
 * [What about Google Search and Google Plus?](http://wpsso.com/codex/plugins/wpsso/faq/what-about-google-search-and-google-plus/)
@@ -284,10 +285,9 @@ Follow Surnia Ulula on [Google+](https://plus.google.com/+SurniaUlula/?rel=autho
 	* [Author Gravatar](http://wpsso.com/codex/plugins/wpsso/notes/modules/author-gravatar/)
 	* [Easy Digital Downloads](http://wpsso.com/codex/plugins/wpsso/notes/modules/easy-digital-downloads/)
 	* [HeadSpace2 SEO](http://wpsso.com/codex/plugins/wpsso/notes/modules/headspace2-seo/)
-	* [Jetpack Photon](http://wpsso.com/codex/plugins/wpsso/notes/modules/jetpack-photon/)
 	* [Slideshare, Vimeo, Wistia, Youtube APIs](http://wpsso.com/codex/plugins/wpsso/notes/modules/slideshare-vimeo-wistia-youtube-apis/)
 	* [WooCommerce](http://wpsso.com/codex/plugins/wpsso/notes/modules/woocommerce/)
-	* [WordPress REST API v2](http://wpsso.com/codex/plugins/wpsso/notes/modules/wordpress-rest-api-v2/)
+	* [WordPress REST API version 2](http://wpsso.com/codex/plugins/wpsso/notes/modules/wordpress-rest-api-v2/)
 * [Contact Information and Feeds](http://wpsso.com/codex/plugins/wpsso/notes/contact-information/)
 * [Developer Resources](http://wpsso.com/codex/plugins/wpsso/notes/developer/)
 	* [Constants](http://wpsso.com/codex/plugins/wpsso/notes/developer/constants/)
@@ -298,6 +298,7 @@ Follow Surnia Ulula on [Google+](https://plus.google.com/+SurniaUlula/?rel=autho
 			* [Modify the article:tag Keywords / Names](http://wpsso.com/codex/plugins/wpsso/notes/developer/filters/examples/modify-the-articletag-keywords-names/)
 			* [Modify the Default Topics List](http://wpsso.com/codex/plugins/wpsso/notes/developer/filters/examples/modify-the-default-topics-list/)
 			* [Modify the Home Page Title for Facebook / Open Graph](http://wpsso.com/codex/plugins/wpsso/notes/developer/filters/examples/modify-the-home-page-title-for-facebook-open-graph/)
+			* [Use the REQUEST_URI for Post URLs](http://wpsso.com/codex/plugins/wpsso/notes/developer/filters/examples/use-the-request_uri-for-post-urls/)
 			* [Working with Pre-defined Meta Tags and Custom Post Types](http://wpsso.com/codex/plugins/wpsso/notes/developer/filters/examples/working-with-pre-defined-meta-tags-and-custom-post-types/)
 		* [Filters by Category](http://wpsso.com/codex/plugins/wpsso/notes/developer/filters/by-category/)
 			* [Head Filters](http://wpsso.com/codex/plugins/wpsso/notes/developer/filters/by-category/head/)
@@ -309,7 +310,6 @@ Follow Surnia Ulula on [Google+](https://plus.google.com/+SurniaUlula/?rel=autho
 		* [Other Filters](http://wpsso.com/codex/plugins/wpsso/notes/developer/filters/other/)
 * [Inline Variables](http://wpsso.com/codex/plugins/wpsso/notes/inline-variables/)
 * [Multisite / Network Support](http://wpsso.com/codex/plugins/wpsso/notes/multisite-network-support/)
-* [Performance Tuning](http://wpsso.com/codex/plugins/wpsso/notes/performance-tuning/)
 * [Working with Image Attachments](http://wpsso.com/codex/plugins/wpsso/notes/working-with-image-attachments/)
 
 == Screenshots ==
@@ -343,9 +343,173 @@ This release schedule keeps the code stable and reliable, at the cost of more fr
 * [GitHub](https://github.com/SurniaUlula/wpsso)
 * [WordPress.org](https://wordpress.org/plugins/wpsso/developers/)
 
-= Version 3.19.0 (TBD) =
+= Version 3.21.5 (2016/01/16) =
 
 Official announcement: N/A
+
+* **New Features**
+	* *None*
+* **Improvements**
+	* Added a shorter and more helpful notice, displayed for users without admin privileges, for images that are too small.
+* **Bugfixes**
+	* Fixed the 'fb_app_id' value check for some 32bit platforms where the max integer size is 2147483647.
+* **Developer Notes**
+	* *None*
+
+= Version 3.21.4 (2016/01/14) =
+
+Official announcement: N/A
+
+* **New Features**
+	* *None*
+* **Improvements**
+	* Added enabled / disabled / recommended tooltip text to the green / gray / red status lights in the settings page side metaboxes.
+* **Bugfixes**
+	* *None*
+* **Developer Notes**
+	* *None*
+
+= Version 3.21.3 (2016/01/10) =
+
+Official announcement: N/A
+
+* **New Features**
+	* *None*
+* **Improvements**
+	* *None*
+* **Bugfixes**
+	* Fixed the `SucomUtil::get_max_nums()` method to return the correct maximum number of Open Graph images for index type webpages.
+* **Developer Notes**
+	* *None*
+
+= Version 3.21.2 (2016/01/09) =
+
+Official announcement: N/A
+
+* **New Features**
+	* *None*
+* **Improvements**
+	* Removed the Jetpack Photon integration module -- the latest version of Photon can return correct image dimensions.
+	* Moved the "Social Preview" tab from third to first in the Social Settings metabox.
+* **Bugfixes**
+	* Fixed author Schema meta tags by adding only to Article, Blog, Review, WebPage, and WebSite item types.
+* **Developer Notes**
+	* Modified all `get_options()` and `get_defaults()` methods to return a null instead of false for a missing settings key.
+	* Wrapped the `image_downsize()` function with `array_pad()` to sanitize the output (prevents a PHP notice caused by Jetpack Photon).
+
+= Version 3.21.1 (2016/01/06) =
+
+Official announcement: N/A
+
+* **New Features**
+	* *None*
+* **Improvements**
+	* *None*
+* **Bugfixes**
+	* Fixed the missing Social Img / Desc columns after using Quick Edit on a post / page.
+	* Fixed recurring error message about resetting the 'plugin_object_cache_exp' option to its default value (Free version).
+* **Developer Notes**
+	* Added a new 'wpsso_columns_post_{post_type_name}' filter (true by default).
+	* Added an integer cast when saving numeric options.
+
+= Version 3.21.0 (2016/01/03) =
+
+Official announcement: http://wpsso.com/2016/01/03/wpsso-update-upscale-enlarge-small-images/
+
+* **New Features**
+	* Added new "Allow Upscaling of Small WP Images" and "Maximum Image Upscale Percentage" options on the Advanced settings page, under the WP / Theme Integration tab (Pro version).
+* **Improvements**
+	* Improved the NextGEN Gallery integration module by calling `get_post_object()` instead of using the $post global.
+	* Added `SucomUtil::encode_emoji()` to call WordPress v4.2's `wp_encode_emoji()` function if available (or duplicate its behavior if missing).
+* **Bugfixes**
+	* Fixed a call to a `wp_encode_emoji()` function which did not exist before WordPress v4.2.
+* **Developer Notes**
+	* Added the $post_id argument to NGG integration module methods for `get_post_object()`.
+	* Added two constants for the image upscaling feature:
+		* WPSSO_IMAGE_UPSCALE_ALL = false
+		* WPSSO_IMAGE_UPSCALE_TEST = false
+	* Added three filters for the image upscaling feature:
+		* apply_filters( 'wpsso_image_upscale_all', WPSSO_IMAGE_UPSCALE_ALL = false );
+		* apply_filters( 'wpsso_image_upscale_max', $max_diff = 50, $img_info );
+		* apply_filters( 'wpsso_image_upscale_test', WPSSO_IMAGE_UPSCALE_TEST = false, $img_info );
+
+= Version 3.20.1.3 (2015/12/30) =
+
+Official announcement: N/A
+
+* **New Features**
+	* *None*
+* **Improvements**
+	* *None*
+* **Bugfixes**
+	* Fixed a preg_replace_callback() syntax error.
+* **Developer Notes**
+	* *None*
+
+= Version 3.20.1.2 (2015/12/29) =
+
+Official announcement: N/A
+
+* **New Features**
+	* *None*
+* **Improvements**
+	* *None*
+* **Bugfixes**
+	* Fixed an Open Graph image size definition issue on the front-end.
+* **Developer Notes**
+	* *None*
+
+= Version 3.20.1.1 (2015/12/27) =
+
+Official announcement: N/A
+
+* **New Features**
+	* Added a "Copy to clipboard" icon for the sharing and short URLs under the Social Preview tab in the Social Settings metabox.
+* **Improvements**
+	* Added an information notice when checking the post/page for duplicate meta tags.
+* **Bugfixes**
+	* Fixed the `get_admin_url()` method, which returned empty URLs, when only hash / query fragments were passed as arguments.
+* **Developer Notes**
+	* Renamed and updated the share/lib/cacert.pem file to share/lib/ca-bundle.crt.
+
+= Version 3.20.0 (2015/12/25) =
+
+Official announcement: N/A
+
+* **New Features**
+	* Added a new "Your Social Settings" menu page with the user profile Social Settings metabox (and removed it from the "Your Profile" page).
+* **Improvements**
+	* Cleaned-up the side metaboxes on settings pages by selectively adding them certain pages and simplifying their content.
+	* Added disabled and internal meta tags to the "Head Tags" list in the Social Settings metabox (shown as gray on gray).
+* **Bugfixes**
+	* Fixed the 'article:published_time' and 'article:modified_time' values on post editing pages.
+* **Developer Notes**
+	* Added a call to `wp_encode_emoji()` for all encoded string values.
+	* Added a new `$this->menu_lib` property to all setting pages (value passed to constructor).
+	* Renamed the `WPSSO_ADD_SETTINGS_PRIORITY` constant to `WPSSO_ADD_SUBMENU_PRIORITY`.
+	* Renamed the website class `$id` and `$name` properties to `$website_id` and `$website_name`.
+	* Moved image size definitions from the 'admin_init' hook to 'current_screen'.
+	* Moved `load_meta_page()` methods from the 'admin_head' hook to 'current_screen'.
+	* Refactored the `add_plugin_image_sizes()` method to handle a variety of WP object classes.
+
+= Version 3.19.2 (2015/12/16) =
+
+Official announcement: N/A
+
+* **New Features**
+	* *None*
+* **Improvements**
+	* Updated the Setup Guide.
+	* Added a new "Essential Settings" page to combine all essential / basic General and Advanced options on one page.
+	* Added encoding of special / foreign characters in URL meta tag values.
+* **Bugfixes**
+	* *None*
+* **Developer Notes**
+	* *None*
+
+= Version 3.19.0 (2015/12/14) =
+
+Official announcement: http://wpsso.com/2015/12/14/wpsso-update-json-improvements-and-filter-hooks/
 
 * **New Features**
 	* Added a new "Author Name Format" option under the Google / Schema tab on the General settings page.
@@ -364,83 +528,17 @@ Official announcement: N/A
 	* Refactored the WpssoSchema class and JSON related sections of the WpssoUser class.
 	* Added a call to `getimagesize()` when saving options to retrieve image dimensions from URLs (default image URL, schema logo URL, etc.).
 
-= Version 3.18.1 (2015/12/11) =
-
-Official announcement: http://wpsso.com/2015/12/12/wpsso-update-schema-type-by-post-type/
-
-* **New Features**
-	* *None*
-* **Improvements**
-	* Enabled all fields in the Social Settings metabox when editing a non-auto-draft Post / Page (previously, some fields were only enabled for published Posts / Pages).
-* **Bugfixes**
-	* *None*
-* **Developer Notes**
-	* *None*
-
-= Version 3.18.0 (2015/12/09) =
-
-Official announcement: N/A
-
-* **New Features**
-	* Added a new "Schema Item Type by Post Type" option to select the Schema item type for each post type.
-* **Improvements**
-	* Checks for head HTML elements without attribute filters - along with its template update process - are now done on all header templates, not just the header.php file.
-* **Bugfixes**
-	* *None*
-* **Developer Notes**
-	* Added a new `Sucom::sanitize_key()` method (returns a lower case string with alpha-numeric, hypens, and underscores).
-	* Refactored the post, user, and taxonomy meta code to support action hooks for URL query arguments, and improve loading / parsing of head meta tags.
-	* Renamed the WpssoOptions method `push_add_to_options()` to `add_ptns_to_opts()` and changed its arguments (breaking change - not backwards compatible).
-	* Changed the WpssoUtil `get_post_types()` arguments as well (breaking change - not backwards compatible).
-	* Renamed several WpssoAmin methods:
-		* `load_form_page()` to `load_setting_page()`.
-		* `show_form_page()` to `show_setting_page()`
-		* `head_attr_filter_check()` to `check_tmpl_head_elements()`
-		* `head_attr_filter_update()` to `modify_tmpl_head_elements()`
-
-= Version 3.17.0 (2015/12/06) =
-
-Official announcement: http://surniaulula.com/2015/12/06/ngfb-wpsso-update-improvements-video-autoplay/
-
-* **New Features**
-	* Added a new "Force Autoplay when Possible" option on the General settings page to force autoplay of Vimeo and Wistia videos when possible (Pro version).
-	* Added a new "Show Tabs in Social Settings Metabox" option on the Advanced settings page to include/exclude the Social Preview, Head Tags, and Validate tabs (Pro version).
-* **Improvements**
-	* Refactored the All in One SEO Pack integration module to improved post object detection (Pro version).
-	* Refactored the video integration modules to improve code quality (Pro version).
-	* Moved several Advanced options under the "WP / Theme Integration" tab.
-	* Improved the Head Tags listing in the Social Settings metabox to include JSON and additional Schema markup HTML blocks.
-* **Bugfixes**
-	* *None*
-* **Developer Notes**
-	* Added `sanitize_classname()` and `sanitize_hookname()` static methods in the SucomUtil class.
-	* Added a check for the required mbstring PHP extension.
-
-= Version 3.16.0 (2015/11/27) =
-
-Official announcement: http://surniaulula.com/2015/11/28/ngfb-wpsso-update-new-head_attributes-filter/
-
-* **New Features**
-	* *None*
-* **Improvements**
-	* The default "&lt;head&gt; Attributes Filter Hook" option value has been changed from "language_attributes" to "head_attributes".
-	* Added a check on theme activation / update for a standard &lt;head&gt; element (without an attribute filter) in the header.php theme template. If found, a warning will be displayed with a feature to modify the &lt;head&gt; element in order to include the new "head_attributes" filter.
-* **Bugfixes**
-	* *None*
-* **Developer Notes**
-	* *None*
-
 == Upgrade Notice ==
 
-= 3.19.0 =
+= 3.21.5 =
 
-TBD - Added a new Google / Schema "Author Name Format" option. Additional schema and JSON improvements, including new JSON filter hooks.
+2016/01/16 - Fixed 'fb_app_id' value for some 32bit platforms where max integer size is 2147483647. Added shorter / more helpful notice, displayed for users without admin privileges, for images that are too small.
 
-= 3.18.1 =
+= 3.21.4 =
 
-2015/12/11 - Enabled all fields in the Social Settings metabox when editing a non-auto-draft Post / Page.
+2016/01/14 - Added enabled / disabled / recommended tooltip text to the green / gray / red status lights in the settings page side metaboxes.
 
-= 3.18.0 =
+= 3.21.3 =
 
-2015/12/09 - Added a new "Schema Item Type by Post Type" option, improved head HTML element checks in theme templates, refactored the post, user, and taxonomy meta code.
+2016/01/10 - Fixed the SucomUtil::get_max_nums() method to return the correct maximum number of Open Graph images for index type webpages.
 

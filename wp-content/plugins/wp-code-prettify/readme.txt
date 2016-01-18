@@ -36,6 +36,11 @@ This plugin enable syntax highlighting of code snippets in your post using Googl
 
 == Changelog ==
 
+= 0.2.5 =
+* custom HTML can be add into \<head\>, so you can include some js files, such as lang-matlab.js; 
+* using plugins_url() instead of content_url();
+* Tested up to: 4.4
+
 = 0.2.4 =
 * fix "Strict Standards" error ( Thanks bassjobsen <https://wordpress.org/support/profile/bassjobsen>);
 * Tested up to: 4.0

@@ -2,7 +2,7 @@
 /*
  * License: GPLv3
  * License URI: http://www.gnu.org/licenses/gpl.txt
- * Copyright 2012-2015 - Jean-Sebastien Morisset - http://surniaulula.com/
+ * Copyright 2012-2016 Jean-Sebastien Morisset (http://surniaulula.com/)
  */
 
 if ( ! defined( 'ABSPATH' ) ) 
@@ -32,11 +32,11 @@ if ( ! class_exists( 'WpssoGplAdminAdvanced' ) ) {
 				$this->p->msgs->get( 'pro-feature-msg' ).'</td>';
 
 			$rows[] = $this->p->util->get_th( _x( 'Use Filtered (SEO) Title',
-				'option label', 'wpsso' ), 'highlight', 'plugin_filter_title' ).
+				'option label', 'wpsso' ), null, 'plugin_filter_title' ).
 			$this->get_nocb_cell( 'plugin_filter_title' );
 			
 			$rows[] = $this->p->util->get_th( _x( 'Apply WordPress Content Filters',
-				'option label', 'wpsso' ), 'highlight', 'plugin_filter_content' ).
+				'option label', 'wpsso' ), null, 'plugin_filter_content' ).
 			$this->get_nocb_cell( 'plugin_filter_content' );
 
 			$rows[] = '<tr class="hide_in_basic">'.
@@ -117,8 +117,10 @@ if ( ! class_exists( 'WpssoGplAdminAdvanced' ) ) {
 				$checkboxes .= '<p>'.$this->get_nocb( 'plugin_add_to_'.$post_type->name ).' '.
 					$post_type->label.' '.( empty( $post_type->description ) ?
 						'' : '('.$post_type->description.')' ).'</p>';
+
 			$checkboxes .= '<p>'.$this->get_nocb( 'plugin_add_to_taxonomy' ).
 				' '.__( 'Taxonomy (Categories and Tags)', 'wpsso' ).'</p>';
+
 			$checkboxes .= '<p>'.$this->get_nocb( 'plugin_add_to_user' ).
 				' '.__( 'User Profile', 'wpsso' ).'</p>';
 
@@ -159,71 +161,72 @@ if ( ! class_exists( 'WpssoGplAdminAdvanced' ) ) {
 			return $rows;
 		}
 
-		public function filter_plugin_integration_rows( $rows, $form, $network = false ) {
+		public function filter_plugin_integration_rows( $rows, $form ) {
 
 			$rows[] = '<td colspan="3" align="center">'.
 				$this->p->msgs->get( 'pro-feature-msg' ).'</td>';
 
-			$rows[] = $this->p->util->get_th( _x( 'Check for Duplicate Meta Tags',
-				'option label', 'wpsso' ), 'highlight', 'plugin_check_head' ).
-			$this->get_nocb_cell( 'plugin_check_head' );
-
 			$rows[] = '<tr class="hide_in_basic">'.
 			$this->p->util->get_th( _x( '&lt;html&gt; Attributes Filter Hook',
 				'option label', 'wpsso' ), null, 'plugin_html_attr_filter' ).
-			'<td class="blank">Name:&nbsp;'.$this->p->options['plugin_html_attr_filter_name'].'</td><td class="blank">'.
+			'<td class="blank">Name:&nbsp;'.$this->p->options['plugin_html_attr_filter_name'].', '.
 				'Priority:&nbsp;'.$this->p->options['plugin_html_attr_filter_prio'].'</td>';
-			
+
 			$rows[] = $this->p->util->get_th( _x( '&lt;head&gt; Attributes Filter Hook',
 				'option label', 'wpsso' ), null, 'plugin_head_attr_filter' ).
-			'<td class="blank">Name:&nbsp;'.$this->p->options['plugin_head_attr_filter_name'].'</td><td class="blank">'.
+			'<td class="blank">Name:&nbsp;'.$this->p->options['plugin_head_attr_filter_name'].', '.
 				'Priority:&nbsp;'.$this->p->options['plugin_head_attr_filter_prio'].'</td>';
 			
+			$rows[] = $this->p->util->get_th( _x( 'Check for Duplicate Meta Tags',
+				'option label', 'wpsso' ), null, 'plugin_check_head' ).
+			$this->get_nocb_cell( 'plugin_check_head' );
+
 			$rows[] = '<tr class="hide_in_basic">'.
 			$this->p->util->get_th( _x( 'Use WP Locale for Language',
 				'option label', 'wpsso' ), null, 'plugin_filter_lang' ).
-			$this->get_nocb_cell( 'plugin_filter_lang' ).
-			$this->p->admin->get_site_use( $form, $network, 'plugin_filter_lang' );
+			$this->get_nocb_cell( 'plugin_filter_lang' );
 
 			$rows[] = '<tr class="hide_in_basic">'.
-			$this->p->util->get_th( _x( 'Auto-Resize Media Images',
+			$this->p->util->get_th( _x( 'Create Missing WP Media Images',
 				'option label', 'wpsso' ), null, 'plugin_auto_img_resize' ).
-			$this->get_nocb_cell( 'plugin_auto_img_resize' ).
-			$this->p->admin->get_site_use( $form, $network, 'plugin_auto_img_resize' );
+			$this->get_nocb_cell( 'plugin_auto_img_resize' );
 
 			$rows[] = '<tr class="hide_in_basic">'.
-			$this->p->util->get_th( _x( 'Check Image Dimensions',
+			$this->p->util->get_th( _x( 'Enforce Image Dimensions Check',
 				'option label', 'wpsso' ), null, 'plugin_ignore_small_img' ).
-			$this->get_nocb_cell( 'plugin_ignore_small_img' ).
-			$this->p->admin->get_site_use( $form, $network, 'plugin_ignore_small_img' );
+			$this->get_nocb_cell( 'plugin_ignore_small_img' );
+
+			$rows[] = $this->p->util->get_th( _x( 'Allow Upscaling of Small WP Images',
+				'option label', 'wpsso' ), null, 'plugin_upscale_images' ).
+			$this->get_nocb_cell( 'plugin_upscale_images' ).'</td>';
+
+			$rows[] = $this->p->util->get_th( _x( 'Maximum Image Upscale Percentage',
+				'option label', 'wpsso' ), null, 'plugin_upscale_img_max' ).
+			'<td class="blank">'.$this->p->options['plugin_upscale_img_max'].' %</td>';
 
 			if ( ! empty( $this->p->cf['*']['lib']['shortcode'] ) ) {
 				$rows[] = '<tr class="hide_in_basic">'.
 				$this->p->util->get_th( _x( 'Enable Plugin Shortcode(s)',
 					'option label', 'wpsso' ), null, 'plugin_shortcodes' ).
-				$this->get_nocb_cell( 'plugin_shortcodes' ).
-				$this->p->admin->get_site_use( $form, $network, 'plugin_shortcodes' );
+				$this->get_nocb_cell( 'plugin_shortcodes' );
 			}
 
 			if ( ! empty( $this->p->cf['*']['lib']['widget'] ) ) {
 				$rows[] = '<tr class="hide_in_basic">'.
 				$this->p->util->get_th( _x( 'Enable Plugin Widget(s)',
 					'option label', 'wpsso' ), null, 'plugin_widgets' ).
-				$this->get_nocb_cell( 'plugin_widgets' ).
-				$this->p->admin->get_site_use( $form, $network, 'plugin_widgets' );
+				$this->get_nocb_cell( 'plugin_widgets' );
 			}
 
 			$rows[] = '<tr class="hide_in_basic">'.
 			$this->p->util->get_th( _x( 'Enable WP Excerpt for Pages',
 				'option label', 'wpsso' ), null, 'plugin_page_excerpt' ).
-			$this->get_nocb_cell( 'plugin_page_excerpt' ).
-			$this->p->admin->get_site_use( $form, $network, 'plugin_page_excerpt' );
+			$this->get_nocb_cell( 'plugin_page_excerpt' );
 
 			$rows[] = '<tr class="hide_in_basic">'.
 			$this->p->util->get_th( _x( 'Enable WP Tags for Pages',
 				'option label', 'wpsso' ), null, 'plugin_page_tags' ).
-			$this->get_nocb_cell( 'plugin_page_tags' ).
-			$this->p->admin->get_site_use( $form, $network, 'plugin_page_tags' );
+			$this->get_nocb_cell( 'plugin_page_tags' );
 
 			return $rows;
 		}
@@ -234,12 +237,12 @@ if ( ! class_exists( 'WpssoGplAdminAdvanced' ) ) {
 				$this->p->msgs->get( 'pro-feature-msg', array( 'lca' => 'wpsso' ) ).'</td>';
 
 			$rows['plugin_object_cache_exp'] = $this->p->util->get_th( _x( 'Object Cache Expiry',
-				'option label', 'wpsso' ), 'highlight', 'plugin_object_cache_exp' ).
+				'option label', 'wpsso' ), null, 'plugin_object_cache_exp' ).
 			'<td nowrap class="blank">'.$this->p->options['plugin_object_cache_exp'].' seconds</td>'.
 			$this->p->admin->get_site_use( $form, $network, 'plugin_object_cache_exp' );
 
 			$rows['plugin_verify_certs'] = '<tr class="hide_in_basic">'.
-			$this->p->util->get_th( _x( 'Verify SSL Certificates',
+			$this->p->util->get_th( _x( 'Verify Peer SSL Certificate',
 				'option label', 'wpsso' ), null, 'plugin_verify_certs' ).
 			$this->get_nocb_cell( 'plugin_verify_certs' ).
 			$this->p->admin->get_site_use( $form, $network, 'plugin_verify_certs' );
@@ -253,16 +256,16 @@ if ( ! class_exists( 'WpssoGplAdminAdvanced' ) ) {
 			return $rows;
 		}
 
-		public function filter_plugin_apikeys_rows( $rows, $form, $network = false ) {
+		public function filter_plugin_apikeys_rows( $rows, $form ) {
 
-			$rows[] = '<td colspan="'.( $network ? 4 : 2 ).'" align="center">'.
+			$rows[] = '<td colspan="2" align="center">'.
 				$this->p->msgs->get( 'pro-feature-msg', array( 'lca' => 'wpsso' ) ).'</td>';
 
 			$rows['plugin_shortener'] = $this->p->util->get_th( _x( 'Preferred URL Shortening Service',
-				'option label', 'wpsso' ), 'highlight', 'plugin_shortener' ).
+				'option label', 'wpsso' ), null, 'plugin_shortener' ).
 			'<td class="blank">[none]</td>';
 
-			$rows['plugin_shortlink'] = $this->p->util->get_th( _x( '<em>Get Shortlink</em> Button Gives Short URL',
+			$rows['plugin_shortlink'] = $this->p->util->get_th( _x( '<em>Get Shortlink</em> Gives Shortened URL',
 				'option label', 'wpsso' ), null, 'plugin_shortlink' ).
 			$this->get_nocb_cell( 'plugin_shortlink' );
 
@@ -384,6 +387,14 @@ if ( ! class_exists( 'WpssoGplAdminAdvanced' ) ) {
 						case 'add_meta_name_description':
 							$highlight = ' highlight';
 							break;
+						// non standard / internal meta tags
+						case 'add_meta_property_og:image:cropped':
+						case 'add_meta_property_og:video:embed_url':
+						case 'add_meta_property_og:image:id':
+						case ( strpos( $opt, 'add_meta_property_pinterest:' ) === 0 ? true : false ):
+						case ( strpos( $opt, 'add_meta_property_product:rating:' ) === 0 ? true : false ):
+							$highlight = ' is_disabled';
+							break;
 						default:
 							$highlight = '';
 							break;
@@ -412,8 +423,9 @@ if ( ! class_exists( 'WpssoGplAdminAdvanced' ) ) {
 					( empty( $text ) ? '' : ' '.$text );
 		}
 
-		private function get_nocb_cell( $name, $text = '' ) {
-			return '<td class="blank">'.$this->get_nocb( $name, $text ).'</td>';
+		private function get_nocb_cell( $name, $text = '', $comment = '' ) {
+			return '<td class="blank">'.$this->get_nocb( $name, $text ).
+				( empty( $comment ) ? '' : ' '.$comment ).'</td>';
 		}
 	}
 }

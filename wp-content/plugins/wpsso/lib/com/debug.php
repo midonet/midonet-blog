@@ -2,7 +2,7 @@
 /*
  * License: GPLv3
  * License URI: http://www.gnu.org/licenses/gpl.txt
- * Copyright 2012-2015 - Jean-Sebastien Morisset - http://surniaulula.com/
+ * Copyright 2012-2016 Jean-Sebastien Morisset (http://surniaulula.com/)
  */
 
 if ( ! defined( 'ABSPATH' ) ) 
@@ -35,7 +35,7 @@ if ( ! class_exists( 'SucomDebug' ) ) {
 			$this->mark();
 		}
 
-		public function mark( $id = false ) { 
+		public function mark( $id = false, $comment = '' ) { 
 			if ( $this->enabled !== true ) 
 				return;
 
@@ -64,6 +64,7 @@ if ( ! class_exists( 'SucomDebug' ) ) {
 			$this->log( 'mark ('.
 				$this->get_time_text( $cur_stats['time'] - $this->start_stats['time'] ).' / '.
 				$this->get_mem_text( $cur_stats['mem'] - $this->start_stats['mem'] ).')'.
+				( $comment ? ' '.$comment : '' ).
 				( $id !== false ? "\n\t".$id_text : '' ), 2 );
 		}
 
@@ -217,6 +218,10 @@ if ( ! class_exists( 'SucomDebug' ) ) {
 						$val = 'false';
 					elseif ( $val === true )
 						$val = 'true';
+					elseif ( $val === null )
+						$val = 'null';
+					elseif ( $val === '' )
+						$val = '\'\'';
 					$line .= $key.'='.$val.', ';
 				}
 				return '('.trim( $line, ', ' ).')'; 

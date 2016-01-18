@@ -2,7 +2,7 @@
 /*
  * License: GPLv3
  * License URI: http://www.gnu.org/licenses/gpl.txt
- * Copyright 2012-2015 - Jean-Sebastien Morisset - http://surniaulula.com/
+ * Copyright 2012-2016 Jean-Sebastien Morisset (http://surniaulula.com/)
  */
 
 if ( ! defined( 'ABSPATH' ) ) 
@@ -12,11 +12,13 @@ if ( ! class_exists( 'WpssoSubmenuReadme' ) && class_exists( 'WpssoAdmin' ) ) {
 
 	class WpssoSubmenuReadme extends WpssoAdmin {
 
-		public function __construct( &$plugin, $id, $name ) {
+		public function __construct( &$plugin, $id, $name, $lib ) {
 			$this->p =& $plugin;
-			$this->p->debug->mark();
+			if ( $this->p->debug->enabled )
+				$this->p->debug->mark();
 			$this->menu_id = $id;
 			$this->menu_name = $name;
+			$this->menu_lib = $lib;
 		}
 
 		protected function add_meta_boxes() {

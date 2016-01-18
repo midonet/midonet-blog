@@ -2,7 +2,7 @@
 /*
  * License: GPLv3
  * License URI: http://www.gnu.org/licenses/gpl.txt
- * Copyright 2012-2015 - Jean-Sebastien Morisset - http://surniaulula.com/
+ * Copyright 2012-2016 Jean-Sebastien Morisset (http://surniaulula.com/)
  */
 
 if ( ! defined( 'ABSPATH' ) ) 
@@ -19,7 +19,12 @@ if ( ! class_exists( 'WpssoUser' ) ) {
 		protected static $pref = array();
 
 		protected function add_actions() {
-			add_filter( 'user_contactmethods', array( &$this, 'add_contact_methods' ), 20, 2 );
+
+			add_filter( 'user_contactmethods', 
+				array( &$this, 'add_contact_methods' ), 20, 2 );
+
+			$this->p->util->add_plugin_filters( $this, 
+				array( 'json_http_schema_org_person' => 6 ) );
 
 			if ( is_admin() ) {
 				/**
@@ -28,11 +33,14 @@ if ( ! class_exists( 'WpssoUser' ) ) {
 				 * but missing when viewing our own profile page.
 				 */
 
-				// common to the show profile and user editing pages
+				// common to your profile and user editing pages
 				add_action( 'admin_init', array( &$this, 'add_metaboxes' ) );
+
 				// load_meta_page() priorities: 100 post, 200 user, 300 taxonomy
-				add_action( 'admin_head', array( &$this, 'load_meta_page' ), 200 );
-				add_action( 'show_user_profile', array( &$this, 'show_metaboxes' ), 20 );	// your profile
+				add_action( 'current_screen', array( &$this, 'load_meta_page' ), 200, 1 );
+
+				// the social settings metabox has moved to its own settings page
+				//add_action( 'show_user_profile', array( &$this, 'show_metabox_section' ), 20 );
 
 				if ( ! empty( $this->p->options['plugin_columns_user'] ) ) {
 
@@ -47,17 +55,19 @@ if ( ! class_exists( 'WpssoUser' ) ) {
 					) );
 				}
 
-				// exit here if not a user page, or showing the profile page
+				// exit here if not a user or profile page
 				$user_id = SucomUtil::get_req_val( 'user_id' );
 				if ( empty( $user_id ) )
 					return;
 
 				// hooks for user and profile editing
-				add_action( 'edit_user_profile', array( &$this, 'show_metaboxes' ), 20 );
-				add_action( 'edit_user_profile_update', array( &$this, 'sanitize_contact_methods' ), 5 );
+				add_action( 'edit_user_profile', array( &$this, 'show_metabox_section' ), 20 );
+
+				add_action( 'edit_user_profile_update', array( &$this, 'sanitize_submit_cm' ), 5 );
 				add_action( 'edit_user_profile_update', array( &$this, 'save_options' ), WPSSO_META_SAVE_PRIORITY );
 				add_action( 'edit_user_profile_update', array( &$this, 'clear_cache' ), WPSSO_META_CACHE_PRIORITY );
-				add_action( 'personal_options_update', array( &$this, 'sanitize_contact_methods' ), 5 ); 
+
+				add_action( 'personal_options_update', array( &$this, 'sanitize_submit_cm' ), 5 ); 
 				add_action( 'personal_options_update', array( &$this, 'save_options' ), WPSSO_META_SAVE_PRIORITY ); 
 				add_action( 'personal_options_update', array( &$this, 'clear_cache' ), WPSSO_META_CACHE_PRIORITY ); 
 			}
@@ -116,29 +126,38 @@ if ( ! class_exists( 'WpssoUser' ) ) {
 			return $value;
 		}
 
-		// hooked into the admin_head action
-		public function load_meta_page() {
-			// all meta modules set this property, so use it to optimize code execution
-			if ( ! empty( WpssoMeta::$head_meta_tags ) )
-				return;
+		// hooked into the current_screen action
+		public function load_meta_page( $screen = false ) {
 
-			$screen_id = SucomUtil::get_screen_id();
+			// all meta modules set this property, so use it to optimize code execution
+			if ( ! empty( WpssoMeta::$head_meta_tags ) 
+				|| ! isset( $screen->id ) )
+					return;
+
 			if ( $this->p->debug->enabled ) {
 				$this->p->debug->mark();
-				$this->p->debug->log( 'screen_id: '.$screen_id );
+				$this->p->debug->log( 'screen id: '.$screen->id );
 			}
 
-			if ( $screen_id !== 'user-edit' &&
-				$screen_id !== 'profile' )
+			$lca = $this->p->cf['lca'];
+			switch ( $screen->id ) {
+				case 'profile':
+				case 'user-edit':
+				case ( strpos( $screen->id, 'profile_page_' ) === 0 ? true : false ):
+				case ( strpos( $screen->id, 'users_page_' ) === 0 ? true : false ):
+					break;
+				default:
 					return;
+					break;
+			}
 
 			$user_id = $this->p->util->get_author_object( 'id' );
 			$add_metabox = empty( $this->p->options[ 'plugin_add_to_user' ] ) ? false : true;
 
 			if ( apply_filters( $this->p->cf['lca'].'_add_metabox_user', 
-				$add_metabox, $user_id, $screen_id ) === true ) {
+				$add_metabox, $user_id, $screen->id ) === true ) {
 
-				do_action( $this->p->cf['lca'].'_admin_user_header', $user_id, $screen_id );
+				do_action( $this->p->cf['lca'].'_admin_user_header', $user_id, $screen->id );
 
 				// use_post is false since this isn't a post
 				// read_cache is false to generate notices etc.
@@ -150,7 +169,6 @@ if ( ! class_exists( 'WpssoUser' ) ) {
 					$this->p->notice->err( $this->p->msgs->get( 'notice-missing-og-image' ) );
 			}
 
-			$lca = $this->p->cf['lca'];
 			$action_query = $lca.'-action';
 			if ( ! empty( $_GET[$action_query] ) ) {
 				$action_name = SucomUtil::sanitize_hookname( $_GET[$action_query] );
@@ -163,7 +181,7 @@ if ( ! class_exists( 'WpssoUser' ) ) {
 					$_SERVER['REQUEST_URI'] = remove_query_arg( array( $action_query, WPSSO_NONCE ) );
 					switch ( $action_name ) {
 						default: 
-							do_action( $lca.'_load_meta_page_user_'.$action_name, $user_id, $screen_id );
+							do_action( $lca.'_load_meta_page_user_'.$action_name, $user_id, $screen->id );
 							break;
 					}
 				}
@@ -183,22 +201,22 @@ if ( ! class_exists( 'WpssoUser' ) ) {
 					array( &$this, 'show_metabox_user' ), 'user', 'normal', 'low' );
 		}
 
-		public function show_metaboxes( $user ) {
+		public function show_metabox_section( $user ) {
 			if ( ! current_user_can( 'edit_user', $user->ID ) )
 				return;
-			$is_suffix = ' '.( $this->p->check->aop( $this->p->cf['lca'], 
+
+			$lca = $this->p->cf['lca'];
+			$is_suffix = ' '.( $this->p->check->aop( $lca, 
 				true, $this->p->is_avail['aop'] ) ? 
 					_x( 'Pro', 'package type', 'wpsso' ) :
 					_x( 'Free', 'package type', 'wpsso' ) );
-			$screen_id = SucomUtil::get_screen_id();
-			$page_name = $screen_id === 'profile' ? 
-				__( 'Your Profile' ) : __( 'Edit User' );
 
-			echo '<h3>'.$this->p->cf['plugin'][$this->p->cf['lca']]['short'].
-				$is_suffix.' &ndash; '.$page_name.'</h3>';
+			echo '<h3 id="'.$lca.'-metaboxes">'.
+				$this->p->cf['plugin'][$lca]['name'].
+				$is_suffix.'</h3>'."\n";
 			echo '<div id="poststuff">';
 			do_meta_boxes( 'user', 'normal', $user );
-			echo '</div>';
+			echo '</div>'."\n";
 		}
 
 		public function show_metabox_user( $user ) {
@@ -282,7 +300,7 @@ if ( ! class_exists( 'WpssoUser' ) ) {
 			return $fields;
 		}
 
-		public function sanitize_contact_methods( $user_id ) {
+		public function sanitize_submit_cm( $user_id ) {
 			if ( ! current_user_can( 'edit_user', $user_id ) )
 				return;
 
@@ -344,64 +362,57 @@ if ( ! class_exists( 'WpssoUser' ) ) {
 			}
 		}
 
-		public function get_person_json_script( $author_id, $size_name = 'thumbnail' ) {
+		public function filter_json_http_schema_org_person( $json, $use_post, $obj, $mt_og, $post_id, $author_id ) {
+			if ( $this->p->debug->enabled )
+				$this->p->debug->mark();
 
-			if ( $this->p->debug->enabled ) {
-				$this->p->debug->args( array(
-					'author_id' => $author_id,
-					'size_name' => $size_name,
-				) );
-			}
+			if ( empty( $this->p->options['schema_author_json'] ) ||
+				empty( $author_id ) )
+					return $json;
 
-			if ( empty( $author_id ) )
+			// only add the person json if the author has a website url
+			$author_website_url = get_the_author_meta( 'url', $author_id );
+			if ( strpos( $author_website_url, '://' ) === false )
 				return false;
 
-			$website_url = get_the_author_meta( 'url', $author_id );
-			if ( strpos( $website_url, '://' ) === false )
-				return false;
-
-			$cm = self::get_user_id_contact_methods( $author_id );
-
+			$size_name = $this->p->cf['lca'].'-schema';
 			$og_image = $this->get_og_image( 1, $size_name, $author_id, false );
-			if ( ! empty( $og_image ) ) {
-				$image = reset( $og_image );
-				$image_url = $image['og:image'];
-			} else $image_url = '';
-
-			$json_script = '<script type="application/ld+json">{
+			$json = '{
 	"@context":"http://schema.org",
 	"@type":"Person",
-	"name":"'.$this->get_author_name( $author_id, 'fullname' ).'",
-	"url":"'.$website_url.'",
-	"image":"'.$image_url.'",
-	"sameAs":['."\n";
-			foreach ( $cm as $id => $label ) {
-				$sameAs = trim( get_the_author_meta( $id, $author_id ) );
-				if ( empty( $sameAs ) )
+	"name":"'.$this->get_author_name( $author_id, 'fullname' )."\",\n".
+	( strpos( $author_website_url, '://' ) === false ? 
+		'' : "\t\"url\":\"".$author_website_url."\",\n" ).
+	$this->p->schema->get_json_image_list( 'image', $og_image, 'og:image' ).
+	"\t\"sameAs\":[\n";
+			$url_list = '';
+			foreach ( self::get_user_id_contact_methods( $author_id ) as $id => $label ) {
+				$url = trim( get_the_author_meta( $id, $author_id ) );
+				if ( empty( $url ) )
 					continue;
-
 				if ( $id === $this->p->options['plugin_cm_twitter_name'] )
-					$sameAs = 'https://twitter.com/'.preg_replace( '/^@/', '', $sameAs );
-
-				if ( strpos( $sameAs, '://' ) !== false )
-					$json_script .= "\t\t\"".$sameAs."\",\n";
+					$url = 'https://twitter.com/'.preg_replace( '/^@/', '', $url );
+				if ( strpos( $url, '://' ) !== false )
+					$url_list .= "\t\t\"".$url."\",\n";
 			}
-			$json_script = rtrim( $json_script, ",\n" )."\n\t]\n}</script>\n";
-
-			return $json_script;
+			return $json.rtrim( $url_list, ",\n" )."\n\t]\n}\n";
 		}
 
-		public function get_article_author( $author_id, $url_field = 'og_author_field' ) {
+		// returns the facebook profile url for an author
+		// unless the pinterest crawler is detected, in which case it returns the author's name
+		public function get_author_profile_url( $author_ids, $url_field = 'og_author_field' ) {
 			$ret = array();
-			if ( ! empty( $author_id ) ) {
-				$ret[] = $this->get_author_website_url( $author_id, $this->p->options[$url_field] );
-
-				// add the author's name if this is the Pinterest crawler
-				if ( SucomUtil::crawler_name( 'pinterest' ) === true )
-					$ret[] = $this->get_author_name( $author_id, $this->p->options['rp_author_name'] );
-
-			} elseif ( $this->p->debug->enabled )
-				$this->p->debug->log( 'author_id provided is empty' );
+			if ( ! empty( $author_ids ) ) {
+				if ( ! is_array( $author_ids ) )
+					$author_ids = array( $author_ids );
+				foreach ( $author_ids as $author_id ) {
+					if ( ! empty( $author_id ) ) {
+						if ( SucomUtil::crawler_name( 'pinterest' ) === true )
+							$ret[] = $this->get_author_name( $author_id, $this->p->options['rp_author_name'] );
+						else $ret[] = $this->get_author_website_url( $author_id, $this->p->options[$url_field] );
+					}
+				}	
+			}
 			return $ret;
 		}
 
@@ -425,10 +436,8 @@ if ( ! class_exists( 'WpssoUser' ) ) {
 					$name = get_the_author_meta( $field_id, $author_id );	// since wp 2.8.0 
 					break;
 			}
-
 			if ( $this->p->debug->enabled )
 				$this->p->debug->log( 'author_id '.$author_id.' '.$field_id.' name: '.$name );
-
 			return $name;
 		}
 
